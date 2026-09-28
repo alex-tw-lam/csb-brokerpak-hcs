@@ -49,6 +49,7 @@ HCS 8.3.1/8.5.x).
 | Elastic Load Balance | `csb-hcs-elb` | operator-configured (ELB flavor IDs are site-specific) | VIP/EIP + listener |
 | GaussDB (openGauss) | `csb-hcs-gaussdb` | inline: small (centralized HA), medium/large (distributed) | administrator credentials + endpoints |
 | CSMS secret | `csb-hcs-csms` | inline: `default` | secret name/value/version |
+| OBS bucket | `csb-hcs-obs` | inline: `default` | bucket name/domain/region |
 
 Only `csb-hcs-elb` needs operator-defined plans via environment variables (its flavor
 IDs are site-specific); see [docs/configuration.md](docs/configuration.md) for the full

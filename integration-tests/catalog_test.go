@@ -8,7 +8,7 @@ import (
 )
 
 var _ = Describe("Catalog", Label("catalog"), func() {
-	It("should publish all six HCS services in the catalog", func() {
+	It("should publish all seven HCS services in the catalog", func() {
 		catalog, err := broker.Catalog()
 		Expect(err).NotTo(HaveOccurred())
 
@@ -19,6 +19,7 @@ var _ = Describe("Catalog", Label("catalog"), func() {
 			"csb-hcs-elb":            elbServiceID,
 			"csb-hcs-gaussdb":        gaussdbServiceID,
 			"csb-hcs-csms":           csmsServiceID,
+			"csb-hcs-obs":            obsServiceID,
 		}
 
 		for name, id := range services {

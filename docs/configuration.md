@@ -51,7 +51,7 @@ currently requires extending `provider.tf` in the service modules.
 
 ## Plans
 
-`csb-hcs-ecs`, `csb-hcs-rds-postgresql`, `csb-hcs-dcs` and `csb-hcs-gaussdb` ship with
+`csb-hcs-ecs`, `csb-hcs-rds-postgresql`, `csb-hcs-dcs`, `csb-hcs-gaussdb` and `csb-hcs-obs` ship with
 inline plans in their service definitions, so the broker starts with a usable catalog
 out of the box. `csb-hcs-elb` alone requires operator-defined plans because ELB flavor
 IDs are site-specific — the broker refuses to start until its variable is set:

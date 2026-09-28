@@ -36,3 +36,4 @@ service_definitions:
 - hcs-elb.yml
 - hcs-gaussdb.yml
 - hcs-csms.yml
+- hcs-obs.yml

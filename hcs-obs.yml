@@ -1,0 +1,134 @@
+version: 1
+name: csb-hcs-obs
+id: 13dcaab5-7831-4f0a-b296-fe582294ea32
+description: CSB HCS OBS Bucket
+display_name: CSB HCS OBS Bucket
+image_url: file://service-images/csb.png
+documentation_url: https://doc.hcs.huawei.com/index.html
+provider_display_name: Huawei Cloud Stack
+support_url: https://doc.hcs.huawei.com/index.html
+tags: [hcs, obs, object-storage, storage]
+plan_updateable: true
+plans:
+- name: default
+  id: f21c74ed-a481-4e6d-95c1-24d6298d4368
+  description: Default OBS bucket plan
+  display_name: Default
+  properties: {}
+provision:
+  plan_inputs: []
+  user_inputs:
+  - field_name: bucket_name
+    type: string
+    details: Name of the bucket (globally unique in OBS, DNS-compatible).
+    default: csb-${request.instance_id}
+    constraints:
+      minLength: 3
+      maxLength: 63
+      pattern: ^[a-z0-9][a-z0-9.-]{1,61}[a-z0-9]$
+    prohibit_update: true
+  - field_name: acl
+    type: string
+    details: canned ACL for the bucket.
+    default: private
+    enum:
+      private: private
+      public-read: public-read
+      public-read-write: public-read-write
+      log-delivery-write: log-delivery-write
+    prohibit_update: true
+  - field_name: storage_class
+    type: string
+    details: Storage class of the bucket.
+    default: STANDARD
+    enum:
+      STANDARD: STANDARD
+      WARM: WARM (infrequent access)
+      COLD: COLD (archive)
+  - field_name: versioning
+    type: boolean
+    details: Enable object versioning. Once enabled, versioning can only be suspended, never fully disabled.
+    default: false
+  - field_name: encryption
+    type: boolean
+    details: Enable default server-side encryption (SSE-KMS).
+    default: false
+  - field_name: kms_key_id
+    type: string
+    nullable: true
+    default: null
+    details: KMS key ID for server-side encryption. When empty, the default master key is used.
+  - field_name: force_destroy
+    type: boolean
+    details: Delete all objects when destroying the bucket on deprovision. When false, deprovision fails if the bucket still contains objects.
+    default: false
+  - field_name: region
+    type: string
+    details: The HCS region to provision in.
+    default: ${config("hcs.region")}
+    prohibit_update: true
+  - field_name: cloud
+    type: string
+    details: HCS cloud domain used to derive service endpoints (e.g. "hcs.example.com").
+    default: ${config("hcs.cloud")}
+    prohibit_update: true
+  computed_inputs:
+  - name: labels
+    default: ${json.marshal(request.default_labels)}
+    overwrite: true
+    type: object
+  template_refs:
+    main: terraform/obs/provision/main.tf
+    variables: terraform/obs/provision/variables.tf
+    outputs: terraform/obs/provision/outputs.tf
+    provider: terraform/obs/provision/provider.tf
+    versions: terraform/obs/provision/versions.tf
+  outputs:
+  - field_name: bucket_name
+    type: string
+    details: Name of the bucket
+  - field_name: bucket_domain_name
+    type: string
+    details: Domain name of the bucket
+  - field_name: region
+    type: string
+    details: HCS region
+  - field_name: cloud
+    type: string
+    details: HCS cloud domain
+bind:
+  plan_inputs: []
+  user_inputs: []
+  computed_inputs:
+  - name: bucket_name
+    default: ${instance.details["bucket_name"]}
+    overwrite: true
+    type: string
+  - name: bucket_domain_name
+    default: ${instance.details["bucket_domain_name"]}
+    overwrite: true
+    type: string
+  - name: region
+    default: ${instance.details["region"]}
+    overwrite: true
+    type: string
+  - name: cloud
+    default: ${instance.details["cloud"]}
+    overwrite: true
+    type: string
+  template_refs:
+    main: terraform/obs/bind/main.tf
+    variables: terraform/obs/bind/variables.tf
+    outputs: terraform/obs/bind/outputs.tf
+    provider: terraform/obs/bind/provider.tf
+    versions: terraform/obs/bind/versions.tf
+  outputs:
+  - field_name: bucket_name
+    type: string
+    details: Name of the bucket
+  - field_name: bucket_domain_name
+    type: string
+    details: Domain name of the bucket
+  - field_name: region
+    type: string
+    details: HCS region
