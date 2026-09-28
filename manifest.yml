@@ -31,7 +31,7 @@ env_config_mapping:
   HCS_AUTH_URL: hcs.auth_url
 service_definitions:
 - hcs-ecs.yml
-- hcs-mysql.yml
+- hcs-postgresql.yml
 - hcs-redis.yml
 - hcs-elb.yml
 - hcs-gaussdb.yml

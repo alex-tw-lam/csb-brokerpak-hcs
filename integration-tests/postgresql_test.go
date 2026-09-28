@@ -7,9 +7,9 @@ import (
 	. "github.com/onsi/gomega/gstruct"
 )
 
-const mysqlServiceName = "csb-hcs-mysql"
+const postgresServiceName = "csb-hcs-postgresql"
 
-var _ = Describe("MySQL", Label("mysql"), func() {
+var _ = Describe("PostgreSQL", Label("postgresql"), func() {
 	BeforeEach(func() {
 		Expect(mockTerraform.SetTFState([]testframework.TFStateValue{})).To(Succeed())
 	})
@@ -19,7 +19,7 @@ var _ = Describe("MySQL", Label("mysql"), func() {
 	})
 
 	It("should provision with defaults", func() {
-		instanceID, err := broker.Provision(mysqlServiceName, "default", map[string]any{
+		instanceID, err := broker.Provision(postgresServiceName, "small", map[string]any{
 			"storage_gb":         100,
 			"availability_zones": []any{"az1"},
 			"vpc_id":             "fake-vpc-id",
@@ -30,13 +30,14 @@ var _ = Describe("MySQL", Label("mysql"), func() {
 		Expect(err).NotTo(HaveOccurred())
 		Expect(mockTerraform.FirstTerraformInvocationVars()).To(
 			SatisfyAll(
-				HaveKeyWithValue("instance_name", "csb-mysql-"+instanceID),
-				HaveKeyWithValue("flavor", "rds.mysql.large.4.single"),
-				HaveKeyWithValue("mysql_version", "8.0"),
+				HaveKeyWithValue("instance_name", "csb-postgresql-"+instanceID),
+				HaveKeyWithValue("flavor", "rds.pg.n1.large.2"),
+				HaveKeyWithValue("pg_version", "12"),
 				HaveKeyWithValue("storage_gb", float64(100)),
 				HaveKeyWithValue("volume_type", "ULTRAHIGH"),
 				HaveKeyWithValue("availability_zones", ConsistOf("az1")),
-				HaveKeyWithValue("port", float64(3306)),
+				HaveKeyWithValue("ha_replication_mode", "async"),
+				HaveKeyWithValue("port", float64(5432)),
 				HaveKeyWithValue("vpc_id", "fake-vpc-id"),
 				HaveKeyWithValue("subnet_name", "subnet-default"),
 				HaveKeyWithValue("security_group_id", "fake-sg-id"),
@@ -53,13 +54,13 @@ var _ = Describe("MySQL", Label("mysql"), func() {
 	})
 
 	It("should not allow changing of plan defined properties", func() {
-		_, err := broker.Provision(mysqlServiceName, "default", map[string]any{
+		_, err := broker.Provision(postgresServiceName, "small", map[string]any{
 			"storage_gb":         100,
 			"availability_zones": []any{"az1"},
 			"vpc_id":             "fake-vpc-id",
 			"subnet_name":        "subnet-default",
 			"security_group_id":  "fake-sg-id",
-			"flavor":             "rds.mysql.xlarge.8.single",
+			"flavor":             "rds.pg.n1.xlarge.2.ha",
 		})
 
 		Expect(err).To(MatchError(ContainSubstring("plan defined properties cannot be changed: flavor")))
@@ -67,21 +68,21 @@ var _ = Describe("MySQL", Label("mysql"), func() {
 
 	DescribeTable("property constraints",
 		func(params map[string]any, expectedErrorMsg string) {
-			_, err := broker.Provision(mysqlServiceName, "default", params)
+			_, err := broker.Provision(postgresServiceName, "small", params)
 
 			Expect(err).To(MatchError(ContainSubstring(expectedErrorMsg)))
 		},
 		Entry(
-			"invalid mysql_version",
+			"invalid pg_version",
 			map[string]any{
 				"storage_gb":         100,
 				"availability_zones": []any{"az1"},
 				"vpc_id":             "fake-vpc-id",
 				"subnet_name":        "subnet-default",
 				"security_group_id":  "fake-sg-id",
-				"mysql_version":      "5.6",
+				"pg_version":         "9.6",
 			},
-			"mysql_version must be one of the following",
+			"pg_version must be one of the following",
 		),
 		Entry(
 			"storage_gb below minimum",
@@ -95,15 +96,16 @@ var _ = Describe("MySQL", Label("mysql"), func() {
 			"storage_gb",
 		),
 		Entry(
-			"storage_gb not multiple of 10",
+			"port outside PostgreSQL range",
 			map[string]any{
-				"storage_gb":         55,
+				"storage_gb":         100,
 				"availability_zones": []any{"az1"},
 				"vpc_id":             "fake-vpc-id",
 				"subnet_name":        "subnet-default",
 				"security_group_id":  "fake-sg-id",
+				"port":               80,
 			},
-			"storage_gb",
+			"port",
 		),
 	)
 
@@ -112,14 +114,14 @@ var _ = Describe("MySQL", Label("mysql"), func() {
 			{Name: "instance_id", Type: "string", Value: "fake-rds-id"},
 			{Name: "name", Type: "string", Value: "fake-rds-name"},
 			{Name: "hostname", Type: "string", Value: "192.168.1.20"},
-			{Name: "port", Type: "number", Value: float64(3306)},
+			{Name: "port", Type: "number", Value: float64(5432)},
 			{Name: "username", Type: "string", Value: "root"},
 			{Name: "password", Type: "string", Value: "fake-admin-password"},
 			{Name: "region", Type: "string", Value: fakeRegion},
 			{Name: "cloud", Type: "string", Value: fakeCloud},
 		})).To(Succeed())
 
-		instanceID, err := broker.Provision(mysqlServiceName, "default", map[string]any{
+		instanceID, err := broker.Provision(postgresServiceName, "small", map[string]any{
 			"storage_gb":         100,
 			"availability_zones": []any{"az1"},
 			"vpc_id":             "fake-vpc-id",
@@ -133,12 +135,12 @@ var _ = Describe("MySQL", Label("mysql"), func() {
 			{Name: "username", Type: "string", Value: "appuser"},
 			{Name: "password", Type: "string", Value: "fake-binding-password"},
 			{Name: "hostname", Type: "string", Value: "192.168.1.20"},
-			{Name: "port", Type: "number", Value: float64(3306)},
-			{Name: "uri", Type: "string", Value: "mysql://appuser:fake-binding-password@192.168.1.20:3306/"},
-			{Name: "jdbcUrl", Type: "string", Value: "jdbc:mysql://192.168.1.20:3306/"},
+			{Name: "port", Type: "number", Value: float64(5432)},
+			{Name: "uri", Type: "string", Value: "postgresql://appuser:fake-binding-password@192.168.1.20:5432/postgres"},
+			{Name: "jdbcUrl", Type: "string", Value: "jdbc:postgresql://192.168.1.20:5432/postgres"},
 		})).To(Succeed())
 
-		creds, err := broker.Bind(mysqlServiceName, "default", instanceID, map[string]any{
+		creds, err := broker.Bind(postgresServiceName, "small", instanceID, map[string]any{
 			"user_name": "appuser",
 		})
 		Expect(err).NotTo(HaveOccurred())
@@ -146,9 +148,9 @@ var _ = Describe("MySQL", Label("mysql"), func() {
 			SatisfyAll(
 				HaveKeyWithValue("username", "appuser"),
 				HaveKeyWithValue("hostname", "192.168.1.20"),
-				HaveKeyWithValue("port", float64(3306)),
-				HaveKeyWithValue("uri", "mysql://appuser:fake-binding-password@192.168.1.20:3306/"),
-				HaveKeyWithValue("jdbcUrl", "jdbc:mysql://192.168.1.20:3306/"),
+				HaveKeyWithValue("port", float64(5432)),
+				HaveKeyWithValue("uri", "postgresql://appuser:fake-binding-password@192.168.1.20:5432/postgres"),
+				HaveKeyWithValue("jdbcUrl", "jdbc:postgresql://192.168.1.20:5432/postgres"),
 				HaveKeyWithValue("password", "fake-binding-password"),
 			),
 		)
@@ -159,9 +161,8 @@ var _ = Describe("MySQL", Label("mysql"), func() {
 			SatisfyAll(
 				HaveKeyWithValue("instance_id", "fake-rds-id"),
 				HaveKeyWithValue("user_name", "appuser"),
-				HaveKeyWithValue("authorized_hosts", ConsistOf("%")),
 				HaveKeyWithValue("hostname", "192.168.1.20"),
-				HaveKeyWithValue("port", float64(3306)),
+				HaveKeyWithValue("port", float64(5432)),
 				HaveKeyWithValue("admin_username", "root"),
 				HaveKeyWithValue("admin_password", "fake-admin-password"),
 				HaveKeyWithValue("region", fakeRegion),

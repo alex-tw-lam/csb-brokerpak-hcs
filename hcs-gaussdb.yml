@@ -9,12 +9,30 @@ provider_display_name: Huawei Cloud Stack
 support_url: https://doc.hcs.huawei.com/index.html
 tags: [hcs, gaussdb, opengauss, database]
 plan_updateable: true
-plans: []
+plans:
+- name: small
+  id: 63f641f9-0cef-4247-aad4-b039d718b09d
+  description: Centralized HA GaussDB (flavor gaussdb.opengauss.ee.m6.2xlarge.x868.ha); AZ count depends on the solution
+  display_name: Small (centralized HA)
+  properties:
+    flavor: gaussdb.opengauss.ee.m6.2xlarge.x868.ha
+- name: medium
+  id: ecae2f3f-cb82-4453-a9bc-10932930e242
+  description: Distributed GaussDB (flavor gaussdb.opengauss.ee.dn.m6.2xlarge.8.in); AZ count depends on the solution
+  display_name: Medium (distributed)
+  properties:
+    flavor: gaussdb.opengauss.ee.dn.m6.2xlarge.8.in
+- name: large
+  id: 97c2229e-3cee-4cb0-b3b3-e909dbbf1798
+  description: Distributed GaussDB (flavor gaussdb.opengauss.ee.dn.m6.4xlarge.8.in); AZ count depends on the solution
+  display_name: Large (distributed)
+  properties:
+    flavor: gaussdb.opengauss.ee.dn.m6.4xlarge.8.in
 provision:
   plan_inputs:
   - field_name: flavor
     type: string
-    details: GaussDB flavor spec code (site-specific; centralized flavors carry an ".ha" style suffix, distributed flavors a ".in" suffix).
+    details: GaussDB flavor spec code (site-specific; centralized flavors carry an ".ha" style suffix, distributed flavors a ".in" suffix). Operators can override the plans via the GSB_SERVICE_CSB_HCS_GAUSSDB_PLANS environment variable.
   user_inputs:
   - field_name: instance_name
     type: string

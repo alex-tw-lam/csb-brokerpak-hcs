@@ -18,8 +18,8 @@ variable "flavor" {
   type        = string
 }
 
-variable "mysql_version" {
-  description = "MySQL engine version."
+variable "pg_version" {
+  description = "PostgreSQL engine version."
   type        = string
 }
 
@@ -39,7 +39,7 @@ variable "availability_zones" {
 }
 
 variable "ha_replication_mode" {
-  description = "HA replication mode for HA flavors."
+  description = "HA replication mode for HA flavors (async or sync)."
   type        = string
 }
 

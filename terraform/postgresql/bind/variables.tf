@@ -14,13 +14,8 @@ variable "instance_id" {
 }
 
 variable "user_name" {
-  description = "Name of the MySQL account for this binding."
+  description = "Name of the PostgreSQL account for this binding (hyphens are converted to underscores)."
   type        = string
-}
-
-variable "authorized_hosts" {
-  description = "Host patterns the account may connect from."
-  type        = list(string)
 }
 
 variable "hostname" {

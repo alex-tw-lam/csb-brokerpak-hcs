@@ -1,6 +1,6 @@
 output "username" {
   description = "Username for the binding account."
-  value       = hcs_rds_mysql_account.account.name
+  value       = hcs_rds_pg_account.account.name
 }
 
 output "password" {

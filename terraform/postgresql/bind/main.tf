@@ -4,9 +4,8 @@ resource "random_password" "password" {
   override_special = "!@#%^*-_=+?"
 }
 
-resource "hcs_rds_mysql_account" "account" {
+resource "hcs_rds_pg_account" "account" {
   instance_id = var.instance_id
-  name        = var.user_name
+  name        = local.account_name
   password    = random_password.password.result
-  hosts       = var.authorized_hosts
 }

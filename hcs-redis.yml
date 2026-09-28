@@ -34,6 +34,14 @@ plans:
     capacity: 4
     cache_mode: single
     engine_version: "5.0"
+- name: ha-large
+  id: 8ec947fc-c1d0-4c98-b243-1c97b1ff6b4e
+  description: Master/standby Redis 5.0 cache with 4GB capacity; requires a standby availability zone
+  display_name: HA Large (master/standby, 4GB)
+  properties:
+    capacity: 4
+    cache_mode: ha
+    engine_version: "5.0"
 provision:
   plan_inputs:
   - field_name: capacity

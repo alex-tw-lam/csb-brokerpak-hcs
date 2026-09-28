@@ -1,36 +1,56 @@
 version: 1
-name: csb-hcs-mysql
-id: e10ce773-dcde-46c6-809f-640ededdc48c
-description: CSB HCS RDS for MySQL
-display_name: CSB HCS RDS for MySQL
+name: csb-hcs-postgresql
+id: 41f4eae4-99c4-4cbb-8f44-bd94bc77829f
+description: CSB HCS RDS for PostgreSQL
+display_name: CSB HCS RDS for PostgreSQL
 image_url: file://service-images/csb.png
 documentation_url: https://doc.hcs.huawei.com/index.html
 provider_display_name: Huawei Cloud Stack
 support_url: https://doc.hcs.huawei.com/index.html
-tags: [hcs, mysql, rds, database]
+tags: [hcs, postgresql, rds, database]
 plan_updateable: true
-plans: []
+plans:
+- name: small
+  id: e462a2f2-096d-412f-8d27-1061ab6e9619
+  description: Single-node RDS for PostgreSQL (flavor rds.pg.n1.large.2); requires one availability zone
+  display_name: Small (single node)
+  properties:
+    flavor: rds.pg.n1.large.2
+- name: medium
+  id: b1fa945a-61b3-4c13-bc6d-51c1dcf398ce
+  description: Primary/standby RDS for PostgreSQL (flavor rds.pg.n1.large.2.ha); requires two availability zones
+  display_name: Medium (primary/standby)
+  properties:
+    flavor: rds.pg.n1.large.2.ha
+- name: large
+  id: 874d9497-6b26-447d-842c-a07653231208
+  description: Primary/standby RDS for PostgreSQL (flavor rds.pg.n1.xlarge.2.ha); requires two availability zones
+  display_name: Large (primary/standby)
+  properties:
+    flavor: rds.pg.n1.xlarge.2.ha
 provision:
   plan_inputs:
   - field_name: flavor
     type: string
-    details: RDS flavor spec code (site-specific). Single-node flavors carry a ".single" suffix, HA flavors an ".ha" suffix and require two availability zones.
+    details: RDS flavor spec code. Single-node flavors have no suffix, HA flavors an ".ha" suffix and require two availability zones. Flavor codes are site-specific; operators can override the plans via the GSB_SERVICE_CSB_HCS_POSTGRESQL_PLANS environment variable.
   user_inputs:
   - field_name: instance_name
     type: string
     details: Name of the RDS instance.
-    default: csb-mysql-${request.instance_id}
+    default: csb-postgresql-${request.instance_id}
     constraints:
       minLength: 4
       maxLength: 64
       pattern: ^[a-zA-Z][a-zA-Z0-9-]*$
-  - field_name: mysql_version
+  - field_name: pg_version
     type: string
-    details: MySQL engine version.
-    default: "8.0"
+    details: PostgreSQL engine version (supported versions are site-dependent).
+    default: "12"
     enum:
-      "5.7": MySQL 5.7
-      "8.0": MySQL 8.0
+      "12": PostgreSQL 12
+      "13": PostgreSQL 13
+      "14": PostgreSQL 14
+      "15": PostgreSQL 15
     prohibit_update: true
   - field_name: storage_gb
     type: integer
@@ -58,17 +78,17 @@ provision:
   - field_name: ha_replication_mode
     type: string
     details: HA replication mode, only used for HA (".ha") flavors.
-    default: semisync
+    default: async
     enum:
       async: async
-      semisync: semisync
+      sync: sync
   - field_name: port
     type: integer
-    details: Database port.
-    default: 3306
+    details: Database port (PostgreSQL allowed range).
+    default: 5432
     constraints:
-      minimum: 1024
-      maximum: 65535
+      minimum: 2100
+      maximum: 9500
   - field_name: vpc_id
     type: string
     required: true
@@ -87,7 +107,7 @@ provision:
     type: string
     nullable: true
     default: null
-    details: Administrator (root) password. When empty, a random password is generated and returned in the provision output details.
+    details: Administrator password. When empty, a random password is generated and returned in the provision output details.
   - field_name: backup_start_time
     type: string
     details: Backup window start (HH:mm-HH:mm, end hour is start hour plus one, minutes in 00/15/30/45).
@@ -117,12 +137,12 @@ provision:
     overwrite: true
     type: object
   template_refs:
-    main: terraform/mysql/provision/main.tf
-    variables: terraform/mysql/provision/variables.tf
-    outputs: terraform/mysql/provision/outputs.tf
-    provider: terraform/mysql/provision/provider.tf
-    versions: terraform/mysql/provision/versions.tf
-    data: terraform/mysql/provision/data.tf
+    main: terraform/postgresql/provision/main.tf
+    variables: terraform/postgresql/provision/variables.tf
+    outputs: terraform/postgresql/provision/outputs.tf
+    provider: terraform/postgresql/provision/provider.tf
+    versions: terraform/postgresql/provision/versions.tf
+    data: terraform/postgresql/provision/data.tf
   outputs:
   - field_name: instance_id
     type: string
@@ -153,18 +173,15 @@ bind:
   user_inputs:
   - field_name: user_name
     type: string
-    details: Name of the MySQL account created for this binding (lowercase letters, digits, hyphens and underscores).
-    default: csb-${str.truncate(16, request.binding_id)}
+    details: |
+      Name of the PostgreSQL account created for this binding (letters, digits, hyphens and
+      underscores; hyphens are converted to underscores to satisfy PostgreSQL account naming,
+      and the name must not start with "pg" or a digit).
+    default: csb-${request.binding_id}
     constraints:
       minLength: 1
-      maxLength: 32
-      pattern: ^[a-z0-9_-]+$
-  - field_name: authorized_hosts
-    type: array
-    details: Host patterns the account may connect from.
-    default:
-    - '%'
-    prohibit_update: true
+      maxLength: 63
+      pattern: ^[a-zA-Z][a-zA-Z0-9_-]*$
   computed_inputs:
   - name: instance_id
     default: ${instance.details["instance_id"]}
@@ -195,12 +212,12 @@ bind:
     overwrite: true
     type: string
   template_refs:
-    main: terraform/mysql/bind/main.tf
-    variables: terraform/mysql/bind/variables.tf
-    outputs: terraform/mysql/bind/outputs.tf
-    provider: terraform/mysql/bind/provider.tf
-    versions: terraform/mysql/bind/versions.tf
-    data: terraform/mysql/bind/data.tf
+    main: terraform/postgresql/bind/main.tf
+    variables: terraform/postgresql/bind/variables.tf
+    outputs: terraform/postgresql/bind/outputs.tf
+    provider: terraform/postgresql/bind/provider.tf
+    versions: terraform/postgresql/bind/versions.tf
+    data: terraform/postgresql/bind/data.tf
   outputs:
   - field_name: username
     type: string

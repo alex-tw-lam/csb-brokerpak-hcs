@@ -17,8 +17,8 @@ resource "hcs_rds_instance" "instance" {
   ha_replication_mode = local.is_ha ? var.ha_replication_mode : null
 
   db {
-    type     = "MySQL"
-    version  = var.mysql_version
+    type     = "PostgreSQL"
+    version  = var.pg_version
     password = local.generated_password
     port     = var.port
   }

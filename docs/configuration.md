@@ -49,29 +49,38 @@ If your site's service endpoint hostnames do not follow the
 `<service>.<region>.<cloud>` convention, set the provider `endpoints` map — this
 currently requires extending `provider.tf` in the service modules.
 
-## Plans for site-specific services
+## Plans
 
-`csb-hcs-mysql`, `csb-hcs-elb` and `csb-hcs-gaussdb` ship with `plans: []` because
-their sizing values (RDS/GaussDB flavor spec codes, ELB flavor IDs) are site-specific.
-Define plans via environment variables containing a JSON array — the plan `properties`
-keys must be declared in that service's `plan_inputs`:
+`csb-hcs-ecs`, `csb-hcs-postgresql`, `csb-hcs-redis` and `csb-hcs-gaussdb` ship with
+inline plans in their service definitions, so the broker starts with a usable catalog
+out of the box. `csb-hcs-elb` alone requires operator-defined plans because ELB flavor
+IDs are site-specific — the broker refuses to start until its variable is set:
 
 ```bash
-export GSB_SERVICE_CSB_HCS_MYSQL_PLANS='[{"name":"small","id":"<uuid>","description":"single node 4c16g","display_name":"small","flavor":"rds.mysql.large.4.single"}]'
 export GSB_SERVICE_CSB_HCS_ELB_PLANS='[{"name":"default","id":"<uuid>","description":"default ELB","display_name":"default","l4_flavor_id":"<site-flavor-id>","l7_flavor_id":"<site-flavor-id>"}]'
-export GSB_SERVICE_CSB_HCS_GAUSSDB_PLANS='[{"name":"default","id":"<uuid>","description":"default GaussDB","display_name":"default","flavor":"gaussdb.opengauss.ee.m6.2xlarge.x868.ha"}]'
+```
+
+The inline plans can be replaced per site via the same environment variables (JSON
+array; plan `properties` keys must be declared in that service's `plan_inputs`):
+
+```bash
+export GSB_SERVICE_CSB_HCS_POSTGRESQL_PLANS='[{"name":"small","id":"<uuid>","description":"single node","display_name":"small","flavor":"rds.pg.n1.large.2"}]'
+export GSB_SERVICE_CSB_HCS_GAUSSDB_PLANS='[{"name":"small","id":"<uuid>","description":"centralized HA","display_name":"small","flavor":"gaussdb.opengauss.ee.m6.2xlarge.x868.ha"}]'
+export GSB_SERVICE_CSB_HCS_REDIS_PLANS='[{"name":"medium","id":"<uuid>","description":"single node 1GB","display_name":"medium","capacity":1,"cache_mode":"single","engine_version":"5.0"}]'
 ```
 
 Notes:
 
+- The shipped flavor codes (`rds.pg.n1.large.2[.ha]`, `gaussdb.opengauss.ee.*`) come
+  from the provider documentation examples; verify them against your site's flavor
+  catalog and override where needed.
 - HA RDS flavors carry an `.ha` suffix and require **two** entries in
-  `availability_zones`; single-node flavors use a `.single` suffix with one AZ.
+  `availability_zones`; single-node flavors need one AZ.
 - GaussDB `flavor`/`solution` determine how many availability zones must be provided
   (`hcs1..hcs7` are the HCS-specific combined solutions).
 - Plan properties cannot be overridden by user parameters at provision time.
-- The Makefile exports sample values for all three variables (see `BROKER_GO_OPTS`);
-  replace the `CHANGE_ME`/sample flavor codes before real use. The `.envrc` file
-  documents the same for local development.
+- The Makefile exports a sample ELB plan (replace the `CHANGE_ME` flavor IDs before
+  real use); the `.envrc` file documents the same for local development.
 
 ## Site-specific user inputs
 
@@ -88,8 +97,11 @@ Notes:
 
 - **ECS**: `flavor_id` may be set explicitly; otherwise the flavor is auto-resolved
   from the plan's `cores`/`memory_gb` via `hcs_ecs_compute_flavors` in the target AZ.
-- **MySQL bind**: creates a dedicated `hcs_rds_mysql_account` per binding with a random
-  password; `user_name` defaults to `csb-<truncated binding id>`.
+- **PostgreSQL bind**: creates a dedicated `hcs_rds_pg_account` per binding with a
+  random password; `user_name` defaults to `csb-<binding id>` and hyphens are
+  converted to underscores to satisfy PostgreSQL account naming (the name must not
+  start with "pg" or a digit). The connection URI targets the default `postgres`
+  database.
 - **Redis**: connection uses `domain_name` (the provider exports no IP attribute);
   flavor auto-resolved from `capacity`/`cache_mode`/`engine_version` via
   `hcs_dcs_flavors`.

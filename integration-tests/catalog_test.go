@@ -13,12 +13,12 @@ var _ = Describe("Catalog", Label("catalog"), func() {
 		Expect(err).NotTo(HaveOccurred())
 
 		services := map[string]string{
-			"csb-hcs-ecs":     ecsServiceID,
-			"csb-hcs-mysql":   mysqlServiceID,
-			"csb-hcs-redis":   redisServiceID,
-			"csb-hcs-elb":     elbServiceID,
-			"csb-hcs-gaussdb": gaussdbServiceID,
-			"csb-hcs-csms":    csmsServiceID,
+			"csb-hcs-ecs":        ecsServiceID,
+			"csb-hcs-postgresql": postgresServiceID,
+			"csb-hcs-redis":      redisServiceID,
+			"csb-hcs-elb":        elbServiceID,
+			"csb-hcs-gaussdb":    gaussdbServiceID,
+			"csb-hcs-csms":       csmsServiceID,
 		}
 
 		for name, id := range services {
@@ -51,6 +51,19 @@ var _ = Describe("Catalog", Label("catalog"), func() {
 		))
 	})
 
+	It("should publish the HA plan for the Redis service", func() {
+		catalog, err := broker.Catalog()
+		Expect(err).NotTo(HaveOccurred())
+
+		service := testframework.FindService(catalog, "csb-hcs-redis")
+		Expect(service.Plans).To(ContainElement(
+			MatchFields(IgnoreExtras, Fields{
+				Name: Equal("ha-large"),
+				ID:   Equal(redisHAPlanID),
+			}),
+		))
+	})
+
 	It("should publish inline plans for the Redis service", func() {
 		catalog, err := broker.Catalog()
 		Expect(err).NotTo(HaveOccurred())
@@ -69,17 +82,29 @@ var _ = Describe("Catalog", Label("catalog"), func() {
 				Name: Equal("large"),
 				ID:   Equal(redisLargePlanID),
 			}),
+			MatchFields(IgnoreExtras, Fields{
+				Name: Equal("ha-large"),
+				ID:   Equal(redisHAPlanID),
+			}),
 		))
 	})
 
-	It("should publish environment injected plans for the site-specific services", func() {
+	It("should publish environment injected plans for the ELB service", func() {
 		catalog, err := broker.Catalog()
 		Expect(err).NotTo(HaveOccurred())
 
-		Expect(testframework.FindService(catalog, "csb-hcs-mysql").Plans).To(ConsistOf(
+		Expect(testframework.FindService(catalog, "csb-hcs-postgresql").Plans).To(ConsistOf(
 			MatchFields(IgnoreExtras, Fields{
-				Name: Equal("default"),
-				ID:   Equal(mysqlCustomPlanID),
+				Name: Equal("small"),
+				ID:   Equal(postgresSmallPlanID),
+			}),
+			MatchFields(IgnoreExtras, Fields{
+				Name: Equal("medium"),
+				ID:   Equal(postgresMediumPlanID),
+			}),
+			MatchFields(IgnoreExtras, Fields{
+				Name: Equal("large"),
+				ID:   Equal(postgresLargePlanID),
 			}),
 		))
 		Expect(testframework.FindService(catalog, "csb-hcs-elb").Plans).To(ConsistOf(
@@ -90,8 +115,16 @@ var _ = Describe("Catalog", Label("catalog"), func() {
 		))
 		Expect(testframework.FindService(catalog, "csb-hcs-gaussdb").Plans).To(ConsistOf(
 			MatchFields(IgnoreExtras, Fields{
-				Name: Equal("default"),
-				ID:   Equal(gaussdbCustomPlanID),
+				Name: Equal("small"),
+				ID:   Equal(gaussdbSmallPlanID),
+			}),
+			MatchFields(IgnoreExtras, Fields{
+				Name: Equal("medium"),
+				ID:   Equal(gaussdbMediumPlanID),
+			}),
+			MatchFields(IgnoreExtras, Fields{
+				Name: Equal("large"),
+				ID:   Equal(gaussdbLargePlanID),
 			}),
 		))
 	})

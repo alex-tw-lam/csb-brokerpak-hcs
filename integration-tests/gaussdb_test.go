@@ -18,7 +18,7 @@ var _ = Describe("GaussDB", Label("gaussdb"), func() {
 	})
 
 	It("should provision with defaults", func() {
-		instanceID, err := broker.Provision(gaussdbServiceName, "default", map[string]any{
+		instanceID, err := broker.Provision(gaussdbServiceName, "small", map[string]any{
 			"availability_zones": []any{"az1", "az2", "az3"},
 			"volume_size":        480,
 			"vpc_id":             "fake-vpc-id",
@@ -65,7 +65,7 @@ var _ = Describe("GaussDB", Label("gaussdb"), func() {
 			{Name: "cloud", Type: "string", Value: fakeCloud},
 		})).To(Succeed())
 
-		instanceID, err := broker.Provision(gaussdbServiceName, "default", map[string]any{
+		instanceID, err := broker.Provision(gaussdbServiceName, "small", map[string]any{
 			"availability_zones": []any{"az1", "az2", "az3"},
 			"volume_size":        480,
 			"vpc_id":             "fake-vpc-id",
@@ -83,7 +83,7 @@ var _ = Describe("GaussDB", Label("gaussdb"), func() {
 			{Name: "uri", Type: "string", Value: "postgresql://dbadmin:fake-gaussdb-password@192.168.1.30:8000/postgres"},
 		})).To(Succeed())
 
-		creds, err := broker.Bind(gaussdbServiceName, "default", instanceID, nil)
+		creds, err := broker.Bind(gaussdbServiceName, "small", instanceID, nil)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(creds).To(
 			SatisfyAll(

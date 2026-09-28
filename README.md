@@ -44,14 +44,15 @@ HCS 8.3.1/8.5.x).
 | Service | Name | Plans | Bind credentials |
 |---|---|---|---|
 | ECS compute instance | `csb-hcs-ecs` | inline: small/medium/large (cores/memory; flavor auto-resolved) | instance addresses |
-| RDS for MySQL | `csb-hcs-mysql` | operator-configured (flavor codes are site-specific) | per-binding DB account (`username`/`password`/`hostname`/`port`/`uri`/`jdbcUrl`) |
-| DCS for Redis | `csb-hcs-redis` | inline: small/medium/large (capacity; flavor auto-resolved) | `host`/`port`/`password`/`uri` |
+| RDS for PostgreSQL | `csb-hcs-postgresql` | inline: small (single node), medium/large (primary/standby) | per-binding DB account (`username`/`password`/`hostname`/`port`/`uri`/`jdbcUrl`) |
+| DCS for Redis | `csb-hcs-redis` | inline: small/medium/large single-node + ha-large (capacity; flavor auto-resolved) | `host`/`port`/`password`/`uri` |
 | Elastic Load Balance | `csb-hcs-elb` | operator-configured (ELB flavor IDs are site-specific) | VIP/EIP + listener |
-| GaussDB (openGauss) | `csb-hcs-gaussdb` | operator-configured (flavor/solution are site-specific) | administrator credentials + endpoints |
+| GaussDB (openGauss) | `csb-hcs-gaussdb` | inline: small (centralized HA), medium/large (distributed) | administrator credentials + endpoints |
 | CSMS secret | `csb-hcs-csms` | inline: `default` | secret name/value/version |
 
-See [docs/configuration.md](docs/configuration.md) for the environment variables needed
-to run the broker and to define plans for the operator-configured services.
+Only `csb-hcs-elb` needs operator-defined plans via environment variables (its flavor
+IDs are site-specific); see [docs/configuration.md](docs/configuration.md) for the full
+configuration reference, including how to override the inline plans per site.
 
 ## Repository layout
 
