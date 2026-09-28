@@ -41,8 +41,8 @@ provision:
     prohibit_update: true
   - field_name: listener_protocol
     type: string
-    details: Listener protocol.
-    default: HTTP
+    details: Listener protocol (TCP by default for a TCP-based load balancer).
+    default: TCP
     enum:
       TCP: TCP
       UDP: UDP
@@ -129,6 +129,12 @@ provision:
   - field_name: protocol
     type: string
     details: Listener protocol
+  - field_name: pool_id
+    type: string
+    details: ID of the backend server pool
+  - field_name: ipv4_subnet_id
+    type: string
+    details: Neutron subnet ID of the load balancer VIP subnet
   - field_name: region
     type: string
     details: HCS region
@@ -137,7 +143,28 @@ provision:
     details: HCS cloud domain
 bind:
   plan_inputs: []
-  user_inputs: []
+  user_inputs:
+  - field_name: address
+    type: string
+    required: true
+    details: IP address of the backend server to register in the pool (unbinding removes it).
+  - field_name: port
+    type: integer
+    required: true
+    details: Backend port of the server to register.
+    constraints:
+      minimum: 1
+      maximum: 65535
+  - field_name: weight
+    type: integer
+    details: Relative traffic weight of this backend member.
+    default: 1
+    constraints:
+      minimum: 1
+  - field_name: enable_health_check
+    type: boolean
+    details: Create a health monitor probing the backend port (TCP probe, or HTTP for HTTP/HTTPS listeners).
+    default: true
   computed_inputs:
   - name: loadbalancer_id
     default: ${instance.details["loadbalancer_id"]}
@@ -157,6 +184,14 @@ bind:
     type: number
   - name: protocol
     default: ${instance.details["protocol"]}
+    overwrite: true
+    type: string
+  - name: pool_id
+    default: ${instance.details["pool_id"]}
+    overwrite: true
+    type: string
+  - name: ipv4_subnet_id
+    default: ${instance.details["ipv4_subnet_id"]}
     overwrite: true
     type: string
   - name: region
@@ -189,3 +224,12 @@ bind:
   - field_name: protocol
     type: string
     details: Listener protocol
+  - field_name: member_id
+    type: string
+    details: ID of the registered backend member
+  - field_name: address
+    type: string
+    details: Registered backend address
+  - field_name: port
+    type: number
+    details: Registered backend port

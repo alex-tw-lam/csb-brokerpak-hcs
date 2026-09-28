@@ -28,6 +28,16 @@ output "protocol" {
   value       = var.listener_protocol
 }
 
+output "pool_id" {
+  description = "ID of the backend server pool."
+  value       = hcs_elb_pool.pool.id
+}
+
+output "ipv4_subnet_id" {
+  description = "Neutron subnet ID of the load balancer VIP subnet."
+  value       = local.ipv4_subnet_id
+}
+
 output "region" {
   description = "HCS region."
   value       = var.region

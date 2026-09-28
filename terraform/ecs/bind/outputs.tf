@@ -17,3 +17,9 @@ output "public_ip" {
   description = "Public IPv4 address of the instance."
   value       = var.public_ip
 }
+
+output "admin_password" {
+  description = "Administrator password (username is image-dependent, typically root on Linux)."
+  value       = var.admin_password
+  sensitive   = true
+}

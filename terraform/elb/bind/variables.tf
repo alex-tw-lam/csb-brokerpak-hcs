@@ -32,3 +32,33 @@ variable "protocol" {
   description = "Listener protocol."
   type        = string
 }
+
+variable "pool_id" {
+  description = "ID of the backend server pool."
+  type        = string
+}
+
+variable "ipv4_subnet_id" {
+  description = "Neutron subnet ID of the load balancer VIP subnet."
+  type        = string
+}
+
+variable "address" {
+  description = "IP address of the backend server to register."
+  type        = string
+}
+
+variable "port" {
+  description = "Backend port of the server to register."
+  type        = number
+}
+
+variable "weight" {
+  description = "Relative traffic weight of this backend member."
+  type        = number
+}
+
+variable "enable_health_check" {
+  description = "Create a health monitor for the backend port."
+  type        = bool
+}

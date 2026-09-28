@@ -27,3 +27,9 @@ variable "public_ip" {
   description = "Public IPv4 address of the instance."
   type        = string
 }
+
+variable "admin_password" {
+  description = "Administrator password of the instance."
+  type        = string
+  sensitive   = true
+}

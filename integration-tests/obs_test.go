@@ -104,6 +104,14 @@ var _ = Describe("OBS", Label("obs"), func() {
 		instanceID, err := broker.Provision(obsServiceName, "default", nil)
 		Expect(err).NotTo(HaveOccurred())
 
+		// The mock has a single TF state: switch it to the bind workspace outputs before binding.
+		Expect(mockTerraform.SetTFState([]testframework.TFStateValue{
+			{Name: "bucket_name", Type: "string", Value: "fake-bucket"},
+			{Name: "bucket_domain_name", Type: "string", Value: "fake-bucket.obs.fake.hcs.example.com"},
+			{Name: "region", Type: "string", Value: fakeRegion},
+			{Name: "granted", Type: "bool", Value: false},
+		})).To(Succeed())
+
 		creds, err := broker.Bind(obsServiceName, "default", instanceID, nil)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(creds).To(
@@ -111,6 +119,52 @@ var _ = Describe("OBS", Label("obs"), func() {
 				HaveKeyWithValue("bucket_name", "fake-bucket"),
 				HaveKeyWithValue("bucket_domain_name", "fake-bucket.obs.fake.hcs.example.com"),
 				HaveKeyWithValue("region", fakeRegion),
+				HaveKeyWithValue("granted", false),
+			),
+		)
+
+		vars, err := lastTerraformInvocationVars(mockTerraform)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(vars).To(
+			SatisfyAll(
+				HaveKeyWithValue("bucket_name", "fake-bucket"),
+				HaveKeyWithValue("grant_principal", BeNil()),
+				HaveKeyWithValue("grant_permission", "read-write"),
+			),
+		)
+	})
+
+	It("should attach a bucket policy when a grant principal is set", func() {
+		Expect(mockTerraform.SetTFState([]testframework.TFStateValue{
+			{Name: "bucket_name", Type: "string", Value: "fake-bucket"},
+			{Name: "bucket_domain_name", Type: "string", Value: "fake-bucket.obs.fake.hcs.example.com"},
+			{Name: "region", Type: "string", Value: fakeRegion},
+			{Name: "cloud", Type: "string", Value: fakeCloud},
+		})).To(Succeed())
+
+		instanceID, err := broker.Provision(obsServiceName, "default", nil)
+		Expect(err).NotTo(HaveOccurred())
+
+		Expect(mockTerraform.SetTFState([]testframework.TFStateValue{
+			{Name: "bucket_name", Type: "string", Value: "fake-bucket"},
+			{Name: "bucket_domain_name", Type: "string", Value: "fake-bucket.obs.fake.hcs.example.com"},
+			{Name: "region", Type: "string", Value: fakeRegion},
+			{Name: "granted", Type: "bool", Value: true},
+		})).To(Succeed())
+
+		creds, err := broker.Bind(obsServiceName, "default", instanceID, map[string]any{
+			"grant_principal":  "domain/fake-account-id:user/fake-user",
+			"grant_permission": "read",
+		})
+		Expect(err).NotTo(HaveOccurred())
+		Expect(creds).To(HaveKeyWithValue("granted", true))
+
+		vars, err := lastTerraformInvocationVars(mockTerraform)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(vars).To(
+			SatisfyAll(
+				HaveKeyWithValue("grant_principal", "domain/fake-account-id:user/fake-user"),
+				HaveKeyWithValue("grant_permission", "read"),
 			),
 		)
 	})

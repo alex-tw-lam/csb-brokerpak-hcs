@@ -98,7 +98,23 @@ provision:
     details: HCS cloud domain
 bind:
   plan_inputs: []
-  user_inputs: []
+  user_inputs:
+  - field_name: grant_principal
+    type: string
+    nullable: true
+    default: null
+    details: |
+      Optional OBS principal (e.g. "domain/<account-id>:user/<user-name>") granted access to
+      the bucket. When set, the bind attaches a bucket policy for this principal; when empty
+      (default) the bind only passes through the bucket details. Note the bucket policy is a
+      singleton server-side, so only one grant binding should be active per bucket.
+  - field_name: grant_permission
+    type: string
+    details: Permission granted to `grant_principal`.
+    default: read-write
+    enum:
+      read: read-only (list + get)
+      read-write: read, write and delete objects
   computed_inputs:
   - name: bucket_name
     default: ${instance.details["bucket_name"]}
@@ -122,6 +138,7 @@ bind:
     outputs: terraform/obs/bind/outputs.tf
     provider: terraform/obs/bind/provider.tf
     versions: terraform/obs/bind/versions.tf
+    data: terraform/obs/bind/data.tf
   outputs:
   - field_name: bucket_name
     type: string
@@ -132,3 +149,6 @@ bind:
   - field_name: region
     type: string
     details: HCS region
+  - field_name: granted
+    type: boolean
+    details: Whether a bucket policy was attached for the grant principal

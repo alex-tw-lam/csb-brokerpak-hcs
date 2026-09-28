@@ -12,3 +12,8 @@ output "region" {
   description = "HCS region."
   value       = var.region
 }
+
+output "granted" {
+  description = "Whether a bucket policy was attached for the grant principal."
+  value       = local.grant_enabled
+}

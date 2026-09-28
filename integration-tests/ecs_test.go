@@ -125,6 +125,7 @@ var _ = Describe("ECS", Label("ecs"), func() {
 			{Name: "name", Type: "string", Value: "fake-ecs-name"},
 			{Name: "private_ip", Type: "string", Value: "192.168.1.10"},
 			{Name: "public_ip", Type: "string", Value: ""},
+			{Name: "admin_password", Type: "string", Value: "fake-admin-password"},
 			{Name: "region", Type: "string", Value: fakeRegion},
 			{Name: "cloud", Type: "string", Value: fakeCloud},
 		})).To(Succeed())
@@ -145,6 +146,7 @@ var _ = Describe("ECS", Label("ecs"), func() {
 				HaveKeyWithValue("name", "fake-ecs-name"),
 				HaveKeyWithValue("private_ip", "192.168.1.10"),
 				HaveKeyWithValue("public_ip", ""),
+				HaveKeyWithValue("admin_password", "fake-admin-password"),
 			),
 		)
 	})

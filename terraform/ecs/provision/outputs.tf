@@ -18,6 +18,12 @@ output "public_ip" {
   value       = hcs_ecs_compute_instance.instance.public_ip
 }
 
+output "admin_password" {
+  description = "Administrator password (generated when not provided at provision time)."
+  value       = local.generated_password
+  sensitive   = true
+}
+
 output "region" {
   description = "HCS region."
   value       = var.region

@@ -33,7 +33,7 @@ var _ = Describe("ELB", Label("elb"), func() {
 				HaveKeyWithValue("vpc_id", "fake-vpc-id"),
 				HaveKeyWithValue("subnet_name", "subnet-default"),
 				HaveKeyWithValue("ipv4_address", BeNil()),
-				HaveKeyWithValue("listener_protocol", "HTTP"),
+				HaveKeyWithValue("listener_protocol", "TCP"),
 				HaveKeyWithValue("listener_port", float64(80)),
 				HaveKeyWithValue("lb_method", "ROUND_ROBIN"),
 				HaveKeyWithValue("backend_members", BeEmpty()),
@@ -84,14 +84,16 @@ var _ = Describe("ELB", Label("elb"), func() {
 		)
 	})
 
-	It("should bind by passing through the load balancer addresses", func() {
+	It("should register a backend member on bind", func() {
 		Expect(mockTerraform.SetTFState([]testframework.TFStateValue{
 			{Name: "loadbalancer_id", Type: "string", Value: "fake-elb-id"},
 			{Name: "name", Type: "string", Value: "fake-elb-name"},
 			{Name: "vip_address", Type: "string", Value: "192.168.1.100"},
 			{Name: "public_ip", Type: "string", Value: "100.1.1.1"},
 			{Name: "listener_port", Type: "number", Value: float64(80)},
-			{Name: "protocol", Type: "string", Value: "HTTP"},
+			{Name: "protocol", Type: "string", Value: "TCP"},
+			{Name: "pool_id", Type: "string", Value: "fake-pool-id"},
+			{Name: "ipv4_subnet_id", Type: "string", Value: "fake-neutron-subnet-id"},
 			{Name: "region", Type: "string", Value: fakeRegion},
 			{Name: "cloud", Type: "string", Value: fakeCloud},
 		})).To(Succeed())
@@ -102,7 +104,22 @@ var _ = Describe("ELB", Label("elb"), func() {
 		})
 		Expect(err).NotTo(HaveOccurred())
 
-		creds, err := broker.Bind(elbServiceName, "default", instanceID, nil)
+		// The mock has a single TF state: switch it to the bind workspace outputs before binding.
+		Expect(mockTerraform.SetTFState([]testframework.TFStateValue{
+			{Name: "loadbalancer_id", Type: "string", Value: "fake-elb-id"},
+			{Name: "vip_address", Type: "string", Value: "192.168.1.100"},
+			{Name: "public_ip", Type: "string", Value: "100.1.1.1"},
+			{Name: "listener_port", Type: "number", Value: float64(80)},
+			{Name: "protocol", Type: "string", Value: "TCP"},
+			{Name: "member_id", Type: "string", Value: "fake-member-id"},
+			{Name: "address", Type: "string", Value: "192.168.1.10"},
+			{Name: "port", Type: "number", Value: float64(8080)},
+		})).To(Succeed())
+
+		creds, err := broker.Bind(elbServiceName, "default", instanceID, map[string]any{
+			"address": "192.168.1.10",
+			"port":    8080,
+		})
 		Expect(err).NotTo(HaveOccurred())
 		Expect(creds).To(
 			SatisfyAll(
@@ -110,8 +127,48 @@ var _ = Describe("ELB", Label("elb"), func() {
 				HaveKeyWithValue("vip_address", "192.168.1.100"),
 				HaveKeyWithValue("public_ip", "100.1.1.1"),
 				HaveKeyWithValue("listener_port", float64(80)),
-				HaveKeyWithValue("protocol", "HTTP"),
+				HaveKeyWithValue("protocol", "TCP"),
+				HaveKeyWithValue("member_id", "fake-member-id"),
+				HaveKeyWithValue("address", "192.168.1.10"),
+				HaveKeyWithValue("port", float64(8080)),
 			),
 		)
+
+		vars, err := lastTerraformInvocationVars(mockTerraform)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(vars).To(
+			SatisfyAll(
+				HaveKeyWithValue("pool_id", "fake-pool-id"),
+				HaveKeyWithValue("ipv4_subnet_id", "fake-neutron-subnet-id"),
+				HaveKeyWithValue("address", "192.168.1.10"),
+				HaveKeyWithValue("port", float64(8080)),
+				HaveKeyWithValue("weight", float64(1)),
+				HaveKeyWithValue("enable_health_check", true),
+				HaveKeyWithValue("protocol", "TCP"),
+			),
+		)
+	})
+
+	It("should require address and port to bind", func() {
+		Expect(mockTerraform.SetTFState([]testframework.TFStateValue{
+			{Name: "loadbalancer_id", Type: "string", Value: "fake-elb-id"},
+			{Name: "vip_address", Type: "string", Value: "192.168.1.100"},
+			{Name: "public_ip", Type: "string", Value: ""},
+			{Name: "listener_port", Type: "number", Value: float64(80)},
+			{Name: "protocol", Type: "string", Value: "TCP"},
+			{Name: "pool_id", Type: "string", Value: "fake-pool-id"},
+			{Name: "ipv4_subnet_id", Type: "string", Value: "fake-neutron-subnet-id"},
+			{Name: "region", Type: "string", Value: fakeRegion},
+			{Name: "cloud", Type: "string", Value: fakeCloud},
+		})).To(Succeed())
+
+		instanceID, err := broker.Provision(elbServiceName, "default", map[string]any{
+			"vpc_id":      "fake-vpc-id",
+			"subnet_name": "subnet-default",
+		})
+		Expect(err).NotTo(HaveOccurred())
+
+		_, err = broker.Bind(elbServiceName, "default", instanceID, nil)
+		Expect(err).To(MatchError(ContainSubstring("address")))
 	})
 })

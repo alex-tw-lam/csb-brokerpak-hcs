@@ -114,9 +114,15 @@ Notes:
   `capacity`/`cache_mode`/`engine_version` via `hcs_dcs_flavors`. Bindings create a
   per-binding `hcs_dcs_account` with a random password (requires an engine version
   supporting accounts, Redis 4.0+).
-- **ELB**: set `ipv4_address` explicitly if you need the private VIP in the binding
-  (provider limitation); backend `subnet_id` uses the neutron subnet id resolved from
-  `subnet_name`.
+- **ELB (TCP-based)**: the listener protocol defaults to TCP. Binding registers a
+  backend member (`address` + `port`, optional `weight`) in the pool with an optional
+  health check (TCP probe, or HTTP for HTTP/HTTPS listeners); unbinding removes the
+  member. Set `ipv4_address` explicitly at provision time if you need the private VIP in
+  the binding (provider limitation); backend `subnet_id` uses the neutron subnet id
+  resolved from `subnet_name`.
+- **ECS bind**: exposes the instance addresses plus the administrator password
+  (generated at provision when not provided; username is image-dependent, typically
+  root on Linux).
 - **GaussDB bind**: passes through the instance administrator credentials (no
   per-account resource in provider v2.4.28). Endpoint lists are passed through
   instance details as comma-joined strings and re-split in the bind module.

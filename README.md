@@ -43,13 +43,13 @@ HCS 8.3.1/8.5.x).
 
 | Service | Name | Plans | Bind credentials |
 |---|---|---|---|
-| ECS compute instance | `csb-hcs-ecs` | inline: small/medium/large (`s6.*` flavor codes; cores/memory fallback) | instance addresses |
+| ECS compute instance | `csb-hcs-ecs` | inline: small/medium/large (`s6.*` flavor codes; cores/memory fallback) | instance addresses + admin password |
 | RDS for PostgreSQL | `csb-hcs-rds-postgresql` | inline: small (single node), medium/large (primary/standby) | per-binding DB account (`username`/`password`/`hostname`/`port`/`uri`/`jdbcUrl`) |
 | DCS (Redis engine) | `csb-hcs-dcs` | inline: small/medium/large single-node + ha-large (flavor-based) | per-binding DCS account: `username`/`password`/`host`/`port`/`uri` |
-| Elastic Load Balance | `csb-hcs-elb` | operator-configured (ELB flavor IDs are site-specific) | VIP/EIP + listener |
+| Elastic Load Balance (TCP) | `csb-hcs-elb` | operator-configured (ELB flavor IDs are site-specific) | registers the bound backend in the pool (+health check); VIP/EIP + listener |
 | GaussDB (openGauss) | `csb-hcs-gaussdb` | inline: small (centralized HA), medium/large (distributed) | administrator credentials + endpoints |
 | CSMS secret | `csb-hcs-csms` | inline: `default` | secret name/value/version |
-| OBS bucket | `csb-hcs-obs` | inline: `default` | bucket name/domain/region |
+| OBS bucket | `csb-hcs-obs` | inline: `default` | bucket name/domain/region (+opt-in policy grant) |
 
 Only `csb-hcs-elb` needs operator-defined plans via environment variables (its flavor
 IDs are site-specific); see [docs/configuration.md](docs/configuration.md) for the full

@@ -150,6 +150,9 @@ provision:
   - field_name: public_ip
     type: string
     details: Public IPv4 address of the instance (empty when no EIP is attached)
+  - field_name: admin_password
+    type: string
+    details: Administrator password (generated when not provided)
   - field_name: region
     type: string
     details: HCS region
@@ -174,6 +177,10 @@ bind:
     type: string
   - name: public_ip
     default: ${instance.details["public_ip"]}
+    overwrite: true
+    type: string
+  - name: admin_password
+    default: ${instance.details["admin_password"]}
     overwrite: true
     type: string
   - name: region
@@ -203,3 +210,6 @@ bind:
   - field_name: public_ip
     type: string
     details: Public IPv4 address of the instance (empty when no EIP is attached)
+  - field_name: admin_password
+    type: string
+    details: Administrator password (username is image-dependent, typically root on Linux)

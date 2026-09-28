@@ -22,3 +22,18 @@ output "protocol" {
   description = "Listener protocol."
   value       = var.protocol
 }
+
+output "member_id" {
+  description = "ID of the registered backend member."
+  value       = hcs_elb_member.member.id
+}
+
+output "address" {
+  description = "Registered backend address."
+  value       = var.address
+}
+
+output "port" {
+  description = "Registered backend port."
+  value       = var.port
+}
