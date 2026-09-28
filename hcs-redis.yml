@@ -1,0 +1,201 @@
+version: 1
+name: csb-hcs-redis
+id: b23276b5-f48a-4562-b4d1-5606ad0e63d8
+description: CSB HCS DCS for Redis
+display_name: CSB HCS DCS for Redis
+image_url: file://service-images/csb.png
+documentation_url: https://doc.hcs.huawei.com/index.html
+provider_display_name: Huawei Cloud Stack
+support_url: https://doc.hcs.huawei.com/index.html
+tags: [hcs, redis, dcs, cache]
+plan_updateable: true
+plans:
+- name: small
+  id: ffaad285-a8d5-41b1-a59c-0f79aacb6f4c
+  description: Single-node Redis 5.0 cache with 0.125GB capacity
+  display_name: Small (single node, 0.125GB)
+  properties:
+    capacity: 0.125
+    cache_mode: single
+    engine_version: "5.0"
+- name: medium
+  id: dec64db5-f73e-4869-952e-acf615b3cf0f
+  description: Single-node Redis 5.0 cache with 1GB capacity
+  display_name: Medium (single node, 1GB)
+  properties:
+    capacity: 1
+    cache_mode: single
+    engine_version: "5.0"
+- name: large
+  id: 7467e48d-677b-4d61-8bfe-6959803d3533
+  description: Single-node Redis 5.0 cache with 4GB capacity
+  display_name: Large (single node, 4GB)
+  properties:
+    capacity: 4
+    cache_mode: single
+    engine_version: "5.0"
+provision:
+  plan_inputs:
+  - field_name: capacity
+    type: number
+    details: Cache capacity in GB (discrete values per cache mode; the matching DCS flavor is looked up automatically).
+  - field_name: cache_mode
+    type: string
+    details: DCS cache mode.
+    enum:
+      single: single node
+      ha: master/standby
+      cluster: cluster
+      proxy: proxy cluster
+  - field_name: engine_version
+    type: string
+    details: Redis engine version.
+    enum:
+      "3.0": Redis 3.0 (compatibility)
+      "4.0": Redis 4.0
+      "5.0": Redis 5.0
+      "6.0": Redis 6.0
+  user_inputs:
+  - field_name: instance_name
+    type: string
+    details: Name of the DCS instance.
+    default: csb-redis-${request.instance_id}
+    constraints:
+      minLength: 4
+      maxLength: 64
+      pattern: ^[a-zA-Z][a-zA-Z0-9-]*$
+  - field_name: availability_zone
+    type: string
+    required: true
+    details: Primary availability zone (site-specific, e.g. "az1").
+    prohibit_update: true
+  - field_name: standby_availability_zone
+    type: string
+    nullable: true
+    default: null
+    details: Standby availability zone for "ha" cache mode. Ignored for single-node mode.
+    prohibit_update: true
+  - field_name: vpc_id
+    type: string
+    required: true
+    details: ID of an existing VPC for the instance network.
+    prohibit_update: true
+  - field_name: subnet_name
+    type: string
+    required: true
+    details: Name of an existing subnet within `vpc_id`.
+    prohibit_update: true
+  - field_name: security_group_id
+    type: string
+    nullable: true
+    default: null
+    details: ID of an existing security group (required for Redis 3.0 instances).
+    prohibit_update: true
+  - field_name: port
+    type: integer
+    details: Custom port (Redis 4.0 and above only).
+    default: 6379
+    constraints:
+      minimum: 1
+      maximum: 65535
+  - field_name: password
+    type: string
+    nullable: true
+    default: null
+    details: Instance access password. When empty, a random password is generated and returned in the binding credentials.
+  - field_name: description
+    type: string
+    nullable: true
+    default: null
+    details: Optional description of the instance.
+  - field_name: region
+    type: string
+    details: The HCS region to provision in.
+    default: ${config("hcs.region")}
+    prohibit_update: true
+  - field_name: cloud
+    type: string
+    details: HCS cloud domain used to derive service endpoints (e.g. "hcs.example.com").
+    default: ${config("hcs.cloud")}
+    prohibit_update: true
+  computed_inputs:
+  - name: labels
+    default: ${json.marshal(request.default_labels)}
+    overwrite: true
+    type: object
+  template_refs:
+    main: terraform/redis/provision/main.tf
+    variables: terraform/redis/provision/variables.tf
+    outputs: terraform/redis/provision/outputs.tf
+    provider: terraform/redis/provision/provider.tf
+    versions: terraform/redis/provision/versions.tf
+    data: terraform/redis/provision/data.tf
+  outputs:
+  - field_name: instance_id
+    type: string
+    details: ID of the DCS instance
+  - field_name: name
+    type: string
+    details: Name of the DCS instance
+  - field_name: domain_name
+    type: string
+    details: Connection domain name of the instance
+  - field_name: port
+    type: number
+    details: Connection port
+  - field_name: password
+    type: string
+    details: Instance access password
+  - field_name: region
+    type: string
+    details: HCS region
+  - field_name: cloud
+    type: string
+    details: HCS cloud domain
+bind:
+  plan_inputs: []
+  user_inputs: []
+  computed_inputs:
+  - name: instance_id
+    default: ${instance.details["instance_id"]}
+    overwrite: true
+    type: string
+  - name: domain_name
+    default: ${instance.details["domain_name"]}
+    overwrite: true
+    type: string
+  - name: port
+    default: ${instance.details["port"]}
+    overwrite: true
+    type: number
+  - name: password
+    default: ${instance.details["password"]}
+    overwrite: true
+    type: string
+  - name: region
+    default: ${instance.details["region"]}
+    overwrite: true
+    type: string
+  - name: cloud
+    default: ${instance.details["cloud"]}
+    overwrite: true
+    type: string
+  template_refs:
+    main: terraform/redis/bind/main.tf
+    variables: terraform/redis/bind/variables.tf
+    outputs: terraform/redis/bind/outputs.tf
+    provider: terraform/redis/bind/provider.tf
+    versions: terraform/redis/bind/versions.tf
+  outputs:
+  - field_name: host
+    type: string
+    details: Connection domain name of the instance
+  - field_name: port
+    type: number
+    details: Connection port
+  - field_name: password
+    type: string
+    details: Instance access password
+  - field_name: uri
+    type: string
+    details: Connection URI

@@ -1,0 +1,222 @@
+version: 1
+name: csb-hcs-mysql
+id: e10ce773-dcde-46c6-809f-640ededdc48c
+description: CSB HCS RDS for MySQL
+display_name: CSB HCS RDS for MySQL
+image_url: file://service-images/csb.png
+documentation_url: https://doc.hcs.huawei.com/index.html
+provider_display_name: Huawei Cloud Stack
+support_url: https://doc.hcs.huawei.com/index.html
+tags: [hcs, mysql, rds, database]
+plan_updateable: true
+plans: []
+provision:
+  plan_inputs:
+  - field_name: flavor
+    type: string
+    details: RDS flavor spec code (site-specific). Single-node flavors carry a ".single" suffix, HA flavors an ".ha" suffix and require two availability zones.
+  user_inputs:
+  - field_name: instance_name
+    type: string
+    details: Name of the RDS instance.
+    default: csb-mysql-${request.instance_id}
+    constraints:
+      minLength: 4
+      maxLength: 64
+      pattern: ^[a-zA-Z][a-zA-Z0-9-]*$
+  - field_name: mysql_version
+    type: string
+    details: MySQL engine version.
+    default: "8.0"
+    enum:
+      "5.7": MySQL 5.7
+      "8.0": MySQL 8.0
+    prohibit_update: true
+  - field_name: storage_gb
+    type: integer
+    required: true
+    details: Storage size in GB (grow-only on update, multiple of 10, between 40 and 4000).
+    constraints:
+      minimum: 40
+      maximum: 4000
+      multipleOf: 10
+  - field_name: volume_type
+    type: string
+    details: Volume type for the instance.
+    default: ULTRAHIGH
+    enum:
+      ULTRAHIGH: ULTRAHIGH
+      LOCALSSD: LOCALSSD
+      CLOUDSSD: CLOUDSSD
+      ESSD: ESSD
+    prohibit_update: true
+  - field_name: availability_zones
+    type: array
+    required: true
+    details: Availability zone list. One element for single-node flavors, two elements for HA flavors (e.g. ["az1"] or ["az1","az2"]).
+    prohibit_update: true
+  - field_name: ha_replication_mode
+    type: string
+    details: HA replication mode, only used for HA (".ha") flavors.
+    default: semisync
+    enum:
+      async: async
+      semisync: semisync
+  - field_name: port
+    type: integer
+    details: Database port.
+    default: 3306
+    constraints:
+      minimum: 1024
+      maximum: 65535
+  - field_name: vpc_id
+    type: string
+    required: true
+    details: ID of an existing VPC for the instance network.
+    prohibit_update: true
+  - field_name: subnet_name
+    type: string
+    required: true
+    details: Name of an existing subnet within `vpc_id`.
+    prohibit_update: true
+  - field_name: security_group_id
+    type: string
+    required: true
+    details: ID of an existing security group controlling access to the instance.
+  - field_name: admin_password
+    type: string
+    nullable: true
+    default: null
+    details: Administrator (root) password. When empty, a random password is generated and returned in the provision output details.
+  - field_name: backup_start_time
+    type: string
+    details: Backup window start (HH:mm-HH:mm, end hour is start hour plus one, minutes in 00/15/30/45).
+    default: "03:00-04:00"
+    constraints:
+      pattern: ^([01][0-9]|2[0-3]):(00|15|30|45)-([02][0-9]):(00|15|30|45)$
+  - field_name: backup_keep_days
+    type: integer
+    details: Number of days to keep automated backups (0 disables backups).
+    default: 7
+    constraints:
+      minimum: 0
+      maximum: 732
+  - field_name: region
+    type: string
+    details: The HCS region to provision in.
+    default: ${config("hcs.region")}
+    prohibit_update: true
+  - field_name: cloud
+    type: string
+    details: HCS cloud domain used to derive service endpoints (e.g. "hcs.example.com").
+    default: ${config("hcs.cloud")}
+    prohibit_update: true
+  computed_inputs:
+  - name: labels
+    default: ${json.marshal(request.default_labels)}
+    overwrite: true
+    type: object
+  template_refs:
+    main: terraform/mysql/provision/main.tf
+    variables: terraform/mysql/provision/variables.tf
+    outputs: terraform/mysql/provision/outputs.tf
+    provider: terraform/mysql/provision/provider.tf
+    versions: terraform/mysql/provision/versions.tf
+    data: terraform/mysql/provision/data.tf
+  outputs:
+  - field_name: instance_id
+    type: string
+    details: ID of the RDS instance
+  - field_name: name
+    type: string
+    details: Name of the RDS instance
+  - field_name: hostname
+    type: string
+    details: Private IP address of the instance
+  - field_name: port
+    type: number
+    details: Database port
+  - field_name: username
+    type: string
+    details: Administrator username
+  - field_name: password
+    type: string
+    details: Administrator password
+  - field_name: region
+    type: string
+    details: HCS region
+  - field_name: cloud
+    type: string
+    details: HCS cloud domain
+bind:
+  plan_inputs: []
+  user_inputs:
+  - field_name: user_name
+    type: string
+    details: Name of the MySQL account created for this binding (lowercase letters, digits, hyphens and underscores).
+    default: csb-${str.truncate(16, request.binding_id)}
+    constraints:
+      minLength: 1
+      maxLength: 32
+      pattern: ^[a-z0-9_-]+$
+  - field_name: authorized_hosts
+    type: array
+    details: Host patterns the account may connect from.
+    default:
+    - '%'
+    prohibit_update: true
+  computed_inputs:
+  - name: instance_id
+    default: ${instance.details["instance_id"]}
+    overwrite: true
+    type: string
+  - name: hostname
+    default: ${instance.details["hostname"]}
+    overwrite: true
+    type: string
+  - name: port
+    default: ${instance.details["port"]}
+    overwrite: true
+    type: number
+  - name: admin_username
+    default: ${instance.details["username"]}
+    overwrite: true
+    type: string
+  - name: admin_password
+    default: ${instance.details["password"]}
+    overwrite: true
+    type: string
+  - name: region
+    default: ${instance.details["region"]}
+    overwrite: true
+    type: string
+  - name: cloud
+    default: ${instance.details["cloud"]}
+    overwrite: true
+    type: string
+  template_refs:
+    main: terraform/mysql/bind/main.tf
+    variables: terraform/mysql/bind/variables.tf
+    outputs: terraform/mysql/bind/outputs.tf
+    provider: terraform/mysql/bind/provider.tf
+    versions: terraform/mysql/bind/versions.tf
+    data: terraform/mysql/bind/data.tf
+  outputs:
+  - field_name: username
+    type: string
+    details: Username for the binding account
+  - field_name: password
+    type: string
+    details: Password for the binding account
+  - field_name: hostname
+    type: string
+    details: Hostname (private IP) of the database
+  - field_name: port
+    type: number
+    details: Database port
+  - field_name: uri
+    type: string
+    details: Connection URI
+  - field_name: jdbcUrl
+    type: string
+    details: JDBC connection URL

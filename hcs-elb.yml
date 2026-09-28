@@ -1,0 +1,191 @@
+version: 1
+name: csb-hcs-elb
+id: 3e6f427f-228d-4bd8-a1a1-ffc25acf6edf
+description: CSB HCS Elastic Load Balance
+display_name: CSB HCS Elastic Load Balance
+image_url: file://service-images/csb.png
+documentation_url: https://doc.hcs.huawei.com/index.html
+provider_display_name: Huawei Cloud Stack
+support_url: https://doc.hcs.huawei.com/index.html
+tags: [hcs, elb, loadbalancer, networking]
+plan_updateable: true
+plans: []
+provision:
+  plan_inputs:
+  - field_name: l4_flavor_id
+    type: string
+    details: Layer-4 (TCP/UDP) flavor ID of a pre-created ELB flavor (site-specific, obtained via hcs_elb_flavor).
+  - field_name: l7_flavor_id
+    type: string
+    details: Layer-7 (HTTP/HTTPS) flavor ID of a pre-created ELB flavor (site-specific, obtained via hcs_elb_flavor).
+  user_inputs:
+  - field_name: loadbalancer_name
+    type: string
+    details: Name of the load balancer.
+    default: csb-elb-${request.instance_id}
+  - field_name: vpc_id
+    type: string
+    required: true
+    details: ID of an existing VPC for the load balancer network.
+    prohibit_update: true
+  - field_name: subnet_name
+    type: string
+    required: true
+    details: Name of an existing subnet within `vpc_id`; the load balancer VIP is placed in this subnet.
+    prohibit_update: true
+  - field_name: ipv4_address
+    type: string
+    nullable: true
+    default: null
+    details: Explicit private IPv4 address for the load balancer VIP within the subnet. The HCS provider does not export the assigned private VIP, so setting this makes the address known.
+    prohibit_update: true
+  - field_name: listener_protocol
+    type: string
+    details: Listener protocol.
+    default: HTTP
+    enum:
+      TCP: TCP
+      UDP: UDP
+      HTTP: HTTP
+    prohibit_update: true
+  - field_name: listener_port
+    type: integer
+    details: Listener frontend port.
+    default: 80
+    constraints:
+      minimum: 1
+      maximum: 65535
+    prohibit_update: true
+  - field_name: lb_method
+    type: string
+    details: Backend load balancing algorithm.
+    default: ROUND_ROBIN
+    enum:
+      ROUND_ROBIN: round robin
+      LEAST_CONNECTIONS: least connections
+      SOURCE_IP: source IP hash
+  - field_name: backend_members
+    type: array
+    details: |
+      Backend members as an array of {address, port} objects, e.g. [{"address": "192.168.1.10", "port": 8080}].
+    default: []
+    prohibit_update: true
+  - field_name: allocate_eip
+    type: boolean
+    details: Allocate and associate a new EIP with the load balancer.
+    default: false
+    prohibit_update: true
+  - field_name: eip_iptype
+    type: string
+    details: EIP iptype used when `allocate_eip` is true (site-specific, e.g. "5_bgp").
+    default: 5_bgp
+    prohibit_update: true
+  - field_name: bandwidth_size
+    type: integer
+    details: EIP bandwidth size in Mbit/s used when `allocate_eip` is true.
+    default: 5
+    constraints:
+      minimum: 1
+      maximum: 300
+    prohibit_update: true
+  - field_name: region
+    type: string
+    details: The HCS region to provision in.
+    default: ${config("hcs.region")}
+    prohibit_update: true
+  - field_name: cloud
+    type: string
+    details: HCS cloud domain used to derive service endpoints (e.g. "hcs.example.com").
+    default: ${config("hcs.cloud")}
+    prohibit_update: true
+  computed_inputs:
+  - name: labels
+    default: ${json.marshal(request.default_labels)}
+    overwrite: true
+    type: object
+  template_refs:
+    main: terraform/elb/provision/main.tf
+    variables: terraform/elb/provision/variables.tf
+    outputs: terraform/elb/provision/outputs.tf
+    provider: terraform/elb/provision/provider.tf
+    versions: terraform/elb/provision/versions.tf
+    data: terraform/elb/provision/data.tf
+  outputs:
+  - field_name: loadbalancer_id
+    type: string
+    details: ID of the load balancer
+  - field_name: name
+    type: string
+    details: Name of the load balancer
+  - field_name: vip_address
+    type: string
+    details: Private VIP address (only populated when `ipv4_address` was set explicitly)
+  - field_name: public_ip
+    type: string
+    details: EIP address of the load balancer (empty when no EIP is associated)
+  - field_name: listener_port
+    type: number
+    details: Listener frontend port
+  - field_name: protocol
+    type: string
+    details: Listener protocol
+  - field_name: region
+    type: string
+    details: HCS region
+  - field_name: cloud
+    type: string
+    details: HCS cloud domain
+bind:
+  plan_inputs: []
+  user_inputs: []
+  computed_inputs:
+  - name: loadbalancer_id
+    default: ${instance.details["loadbalancer_id"]}
+    overwrite: true
+    type: string
+  - name: vip_address
+    default: ${instance.details["vip_address"]}
+    overwrite: true
+    type: string
+  - name: public_ip
+    default: ${instance.details["public_ip"]}
+    overwrite: true
+    type: string
+  - name: listener_port
+    default: ${instance.details["listener_port"]}
+    overwrite: true
+    type: number
+  - name: protocol
+    default: ${instance.details["protocol"]}
+    overwrite: true
+    type: string
+  - name: region
+    default: ${instance.details["region"]}
+    overwrite: true
+    type: string
+  - name: cloud
+    default: ${instance.details["cloud"]}
+    overwrite: true
+    type: string
+  template_refs:
+    main: terraform/elb/bind/main.tf
+    variables: terraform/elb/bind/variables.tf
+    outputs: terraform/elb/bind/outputs.tf
+    provider: terraform/elb/bind/provider.tf
+    versions: terraform/elb/bind/versions.tf
+  outputs:
+  - field_name: loadbalancer_id
+    type: string
+    details: ID of the load balancer
+  - field_name: vip_address
+    type: string
+    details: Private VIP address (only populated when `ipv4_address` was set explicitly)
+  - field_name: public_ip
+    type: string
+    details: EIP address of the load balancer (empty when no EIP is associated)
+  - field_name: listener_port
+    type: number
+    details: Listener frontend port
+  - field_name: protocol
+    type: string
+    details: Listener protocol

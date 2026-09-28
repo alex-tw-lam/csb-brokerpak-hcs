@@ -1,0 +1,208 @@
+version: 1
+name: csb-hcs-ecs
+id: be7bfe87-da52-4ebe-b446-df08b0345211
+description: CSB HCS ECS Instance
+display_name: CSB HCS ECS Instance
+image_url: file://service-images/csb.png
+documentation_url: https://doc.hcs.huawei.com/index.html
+provider_display_name: Huawei Cloud Stack
+support_url: https://doc.hcs.huawei.com/index.html
+tags: [hcs, ecs, compute]
+plan_updateable: true
+plans:
+- name: small
+  id: 3976af96-a073-4e2d-a6a9-0b9099e7f980
+  description: Small ECS instance with 2 cores and 4GB memory
+  display_name: Small (2 cores, 4GB)
+  properties:
+    cores: 2
+    memory_gb: 4
+- name: medium
+  id: 314b5107-29b3-4ecc-a3f6-55092ff0525a
+  description: Medium ECS instance with 4 cores and 8GB memory
+  display_name: Medium (4 cores, 8GB)
+  properties:
+    cores: 4
+    memory_gb: 8
+- name: large
+  id: a431b59b-b905-4b91-a75e-5e596c7e4732
+  description: Large ECS instance with 8 cores and 16GB memory
+  display_name: Large (8 cores, 16GB)
+  properties:
+    cores: 8
+    memory_gb: 16
+provision:
+  plan_inputs:
+  - field_name: cores
+    type: integer
+    details: Number of vCPUs; the matching ECS flavor is looked up automatically in the target availability zone.
+  - field_name: memory_gb
+    type: integer
+    details: Memory in GB; combined with `cores` to select the ECS flavor.
+  user_inputs:
+  - field_name: instance_name
+    type: string
+    details: Name of the ECS instance.
+    default: csb-ecs-${request.instance_id}
+    constraints:
+      minLength: 1
+      maxLength: 64
+  - field_name: image_name
+    type: string
+    required: true
+    details: Name of an existing IMS image (site-specific, e.g. "Ubuntu 22.04 server 64bit"). The image is resolved by exact name.
+  - field_name: availability_zone
+    type: string
+    required: true
+    details: Availability zone to place the instance in (site-specific, e.g. "az1").
+    prohibit_update: true
+  - field_name: flavor_id
+    type: string
+    nullable: true
+    default: null
+    details: Explicit ECS flavor ID. When set it overrides the automatic cores/memory flavor lookup (site-specific, e.g. "s6.large.2").
+  - field_name: vpc_id
+    type: string
+    required: true
+    details: ID of an existing VPC for the instance network (e.g. "0fbd8c79-fd5b-4e5a-b5a1-0b8b6a2b9c11").
+    prohibit_update: true
+  - field_name: subnet_name
+    type: string
+    required: true
+    details: Name of an existing subnet within `vpc_id`.
+    prohibit_update: true
+  - field_name: security_group_names
+    type: array
+    details: Names of existing security groups to attach. Defaults to the "default" security group.
+    default:
+    - default
+    prohibit_update: true
+  - field_name: admin_pass
+    type: string
+    nullable: true
+    default: null
+    details: Administrator password for the instance. When empty, a random password is generated and returned in the binding credentials.
+  - field_name: system_disk_type
+    type: string
+    details: System disk type (site-specific in HCS, e.g. "business_type_01").
+    default: business_type_01
+    prohibit_update: true
+  - field_name: system_disk_size
+    type: integer
+    details: System disk size in GB (grow-only on update).
+    default: 40
+    constraints:
+      minimum: 1
+      maximum: 1024
+  - field_name: allocate_eip
+    type: boolean
+    details: Allocate and attach a new EIP to the instance.
+    default: false
+    prohibit_update: true
+  - field_name: eip_iptype
+    type: string
+    details: EIP iptype used when `allocate_eip` is true (site-specific, e.g. "5_bgp").
+    default: 5_bgp
+    prohibit_update: true
+  - field_name: bandwidth_size
+    type: integer
+    details: EIP bandwidth size in Mbit/s used when `allocate_eip` is true.
+    default: 5
+    constraints:
+      minimum: 1
+      maximum: 300
+    prohibit_update: true
+  - field_name: user_data
+    type: string
+    nullable: true
+    default: null
+    details: Optional cloud-init user data (base64 or plain text depending on the image). Forces instance re-creation on change.
+    prohibit_update: true
+  - field_name: region
+    type: string
+    details: The HCS region to provision in.
+    default: ${config("hcs.region")}
+    prohibit_update: true
+  - field_name: cloud
+    type: string
+    details: HCS cloud domain used to derive service endpoints (e.g. "hcs.example.com").
+    default: ${config("hcs.cloud")}
+    prohibit_update: true
+  computed_inputs:
+  - name: labels
+    default: ${json.marshal(request.default_labels)}
+    overwrite: true
+    type: object
+  template_refs:
+    main: terraform/ecs/provision/main.tf
+    variables: terraform/ecs/provision/variables.tf
+    outputs: terraform/ecs/provision/outputs.tf
+    provider: terraform/ecs/provision/provider.tf
+    versions: terraform/ecs/provision/versions.tf
+    data: terraform/ecs/provision/data.tf
+  outputs:
+  - field_name: instance_id
+    type: string
+    details: ID of the ECS instance
+  - field_name: name
+    type: string
+    details: Name of the ECS instance
+  - field_name: private_ip
+    type: string
+    details: Private IPv4 address of the instance
+  - field_name: public_ip
+    type: string
+    details: Public IPv4 address of the instance (empty when no EIP is attached)
+  - field_name: region
+    type: string
+    details: HCS region
+  - field_name: cloud
+    type: string
+    details: HCS cloud domain
+bind:
+  plan_inputs: []
+  user_inputs: []
+  computed_inputs:
+  - name: instance_id
+    default: ${instance.details["instance_id"]}
+    overwrite: true
+    type: string
+  - name: name
+    default: ${instance.details["name"]}
+    overwrite: true
+    type: string
+  - name: private_ip
+    default: ${instance.details["private_ip"]}
+    overwrite: true
+    type: string
+  - name: public_ip
+    default: ${instance.details["public_ip"]}
+    overwrite: true
+    type: string
+  - name: region
+    default: ${instance.details["region"]}
+    overwrite: true
+    type: string
+  - name: cloud
+    default: ${instance.details["cloud"]}
+    overwrite: true
+    type: string
+  template_refs:
+    main: terraform/ecs/bind/main.tf
+    variables: terraform/ecs/bind/variables.tf
+    outputs: terraform/ecs/bind/outputs.tf
+    provider: terraform/ecs/bind/provider.tf
+    versions: terraform/ecs/bind/versions.tf
+  outputs:
+  - field_name: instance_id
+    type: string
+    details: ID of the ECS instance
+  - field_name: name
+    type: string
+    details: Name of the ECS instance
+  - field_name: private_ip
+    type: string
+    details: Private IPv4 address of the instance
+  - field_name: public_ip
+    type: string
+    details: Public IPv4 address of the instance (empty when no EIP is attached)

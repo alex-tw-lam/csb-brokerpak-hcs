@@ -1,0 +1,119 @@
+version: 1
+name: csb-hcs-csms
+id: ffd9a343-2ed5-4dfd-a17e-bb3140568b18
+description: CSB HCS CSMS Secret
+display_name: CSB HCS CSMS Secret
+image_url: file://service-images/csb.png
+documentation_url: https://doc.hcs.huawei.com/index.html
+provider_display_name: Huawei Cloud Stack
+support_url: https://doc.hcs.huawei.com/index.html
+tags: [hcs, csms, secret, security]
+plan_updateable: true
+plans:
+- name: default
+  id: 712128d0-eb3d-4f5e-a397-7fc71a678d50
+  description: Default CSMS secret plan
+  display_name: Default
+  properties: {}
+provision:
+  plan_inputs: []
+  user_inputs:
+  - field_name: secret_name
+    type: string
+    details: Name of the CSMS secret.
+    default: csb-${request.instance_id}
+    constraints:
+      minLength: 1
+      maxLength: 64
+      pattern: ^[a-zA-Z0-9_.-]+$
+    prohibit_update: true
+  - field_name: secret_text
+    type: string
+    nullable: true
+    default: null
+    details: Secret plaintext. When empty, a random secret is generated. Updating the value creates a new secret version.
+  - field_name: kms_key_id
+    type: string
+    nullable: true
+    default: null
+    details: KMS key ID used to encrypt the secret. When empty, the CSMS default key (csms/default) is used.
+    prohibit_update: true
+  - field_name: description
+    type: string
+    nullable: true
+    default: null
+    details: Optional description of the secret.
+  - field_name: region
+    type: string
+    details: The HCS region to provision in.
+    default: ${config("hcs.region")}
+    prohibit_update: true
+  - field_name: cloud
+    type: string
+    details: HCS cloud domain used to derive service endpoints (e.g. "hcs.example.com").
+    default: ${config("hcs.cloud")}
+    prohibit_update: true
+  computed_inputs:
+  - name: labels
+    default: ${json.marshal(request.default_labels)}
+    overwrite: true
+    type: object
+  template_refs:
+    main: terraform/csms/provision/main.tf
+    variables: terraform/csms/provision/variables.tf
+    outputs: terraform/csms/provision/outputs.tf
+    provider: terraform/csms/provision/provider.tf
+    versions: terraform/csms/provision/versions.tf
+    data: terraform/csms/provision/data.tf
+  outputs:
+  - field_name: secret_id
+    type: string
+    details: ID of the CSMS secret
+  - field_name: name
+    type: string
+    details: Name of the CSMS secret
+  - field_name: latest_version
+    type: string
+    details: Latest version of the secret
+  - field_name: secret_text
+    type: string
+    details: Secret plaintext
+  - field_name: region
+    type: string
+    details: HCS region
+  - field_name: cloud
+    type: string
+    details: HCS cloud domain
+bind:
+  plan_inputs: []
+  user_inputs: []
+  computed_inputs:
+  - name: secret_name
+    default: ${instance.details["name"]}
+    overwrite: true
+    type: string
+  - name: region
+    default: ${instance.details["region"]}
+    overwrite: true
+    type: string
+  - name: cloud
+    default: ${instance.details["cloud"]}
+    overwrite: true
+    type: string
+  template_refs:
+    main: terraform/csms/bind/main.tf
+    variables: terraform/csms/bind/variables.tf
+    outputs: terraform/csms/bind/outputs.tf
+    provider: terraform/csms/bind/provider.tf
+    versions: terraform/csms/bind/versions.tf
+    data: terraform/csms/bind/data.tf
+  outputs:
+  - field_name: name
+    type: string
+    details: Name of the CSMS secret
+  - field_name: value
+    type: string
+    details: Latest version plaintext of the secret
+  - field_name: version
+    type: string
+    details: Version of the secret read back

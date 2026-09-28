@@ -1,0 +1,22 @@
+# Reference repositories (cloned for study, not part of the brokerpak)
+.reference/
+
+# Staged release binaries (populated by scripts/fetch-binaries.sh)
+bin/
+
+# Build artifacts
+*.brokerpak
+/cloud-service-broker
+custom.tfrc
+brokerpak-user-docs.md
+
+# Local broker state
+*.db
+*.sqlite*
+*.tfstate*
+
+# Go
+*.test
+coverage.out
+.pak-cache/
+.zcode/

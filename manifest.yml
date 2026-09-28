@@ -1,0 +1,38 @@
+packversion: 1
+name: hcs-services
+version: 0.1.0
+metadata:
+  author: atwlam
+  description: Cloud Service Broker pak for Huawei Cloud Stack (HCS 8.5.x)
+platforms:
+- os: linux
+  arch: amd64
+terraform_binaries:
+- name: tofu
+  version: 1.11.8
+  source: https://github.com/opentofu/opentofu/archive/v1.11.8.zip
+  url_template: ./bin/${name}_${version}_${os}_${arch}/${name}
+  default: true
+- name: terraform-provider-hcs
+  version: 2.4.28
+  source: https://github.com/huaweicloud/terraform-provider-hcs/archive/v2.4.28.zip
+  provider: huaweicloud/hcs
+  url_template: ./bin/${name}_${version}_${os}_${arch}/${name}_v${version}
+- name: terraform-provider-random
+  version: 3.9.0
+  source: https://github.com/hashicorp/terraform-provider-random/archive/v3.9.0.zip
+  url_template: ./bin/${name}_${version}_${os}_${arch}/${name}_v${version}
+env_config_mapping:
+  HCS_ACCESS_KEY: hcs.access_key
+  HCS_SECRET_KEY: hcs.secret_key
+  HCS_CLOUD: hcs.cloud
+  HCS_REGION_NAME: hcs.region
+  HCS_DOMAIN_NAME: hcs.domain_name
+  HCS_AUTH_URL: hcs.auth_url
+service_definitions:
+- hcs-ecs.yml
+- hcs-mysql.yml
+- hcs-redis.yml
+- hcs-elb.yml
+- hcs-gaussdb.yml
+- hcs-csms.yml
