@@ -51,7 +51,7 @@ currently requires extending `provider.tf` in the service modules.
 
 ## Plans
 
-`csb-hcs-ecs`, `csb-hcs-postgresql`, `csb-hcs-redis` and `csb-hcs-gaussdb` ship with
+`csb-hcs-ecs`, `csb-hcs-rds-postgresql`, `csb-hcs-dcs` and `csb-hcs-gaussdb` ship with
 inline plans in their service definitions, so the broker starts with a usable catalog
 out of the box. `csb-hcs-elb` alone requires operator-defined plans because ELB flavor
 IDs are site-specific — the broker refuses to start until its variable is set:
@@ -64,9 +64,9 @@ The inline plans can be replaced per site via the same environment variables (JS
 array; plan `properties` keys must be declared in that service's `plan_inputs`):
 
 ```bash
-export GSB_SERVICE_CSB_HCS_POSTGRESQL_PLANS='[{"name":"small","id":"<uuid>","description":"single node","display_name":"small","flavor":"rds.pg.n1.large.2"}]'
+export GSB_SERVICE_CSB_HCS_RDS_POSTGRESQL_PLANS='[{"name":"small","id":"<uuid>","description":"single node","display_name":"small","flavor":"rds.pg.n1.large.2"}]'
 export GSB_SERVICE_CSB_HCS_GAUSSDB_PLANS='[{"name":"small","id":"<uuid>","description":"centralized HA","display_name":"small","flavor":"gaussdb.opengauss.ee.m6.2xlarge.x868.ha"}]'
-export GSB_SERVICE_CSB_HCS_REDIS_PLANS='[{"name":"medium","id":"<uuid>","description":"single node 1GB","display_name":"medium","capacity":1,"cache_mode":"single","engine_version":"5.0"}]'
+export GSB_SERVICE_CSB_HCS_DCS_PLANS='[{"name":"medium","id":"<uuid>","description":"single node 1GB","display_name":"medium","capacity":1,"cache_mode":"single","engine_version":"5.0"}]'
 ```
 
 Notes:
@@ -97,12 +97,12 @@ Notes:
 
 - **ECS**: `flavor_id` may be set explicitly; otherwise the flavor is auto-resolved
   from the plan's `cores`/`memory_gb` via `hcs_ecs_compute_flavors` in the target AZ.
-- **PostgreSQL bind**: creates a dedicated `hcs_rds_pg_account` per binding with a
+- **RDS for PostgreSQL (`csb-hcs-rds-postgresql`) bind**: creates a dedicated `hcs_rds_pg_account` per binding with a
   random password; `user_name` defaults to `csb-<binding id>` and hyphens are
   converted to underscores to satisfy PostgreSQL account naming (the name must not
   start with "pg" or a digit). The connection URI targets the default `postgres`
   database.
-- **Redis**: connection uses `domain_name` (the provider exports no IP attribute);
+- **DCS (`csb-hcs-dcs`) — Redis engine**: connection uses `domain_name` (the provider exports no IP attribute);
   flavor auto-resolved from `capacity`/`cache_mode`/`engine_version` via
   `hcs_dcs_flavors`.
 - **ELB**: set `ipv4_address` explicitly if you need the private VIP in the binding

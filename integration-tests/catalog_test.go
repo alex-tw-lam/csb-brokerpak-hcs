@@ -13,12 +13,12 @@ var _ = Describe("Catalog", Label("catalog"), func() {
 		Expect(err).NotTo(HaveOccurred())
 
 		services := map[string]string{
-			"csb-hcs-ecs":        ecsServiceID,
-			"csb-hcs-postgresql": postgresServiceID,
-			"csb-hcs-redis":      redisServiceID,
-			"csb-hcs-elb":        elbServiceID,
-			"csb-hcs-gaussdb":    gaussdbServiceID,
-			"csb-hcs-csms":       csmsServiceID,
+			"csb-hcs-ecs":            ecsServiceID,
+			"csb-hcs-rds-postgresql": rdsPostgresServiceID,
+			"csb-hcs-dcs":            dcsServiceID,
+			"csb-hcs-elb":            elbServiceID,
+			"csb-hcs-gaussdb":        gaussdbServiceID,
+			"csb-hcs-csms":           csmsServiceID,
 		}
 
 		for name, id := range services {
@@ -51,40 +51,40 @@ var _ = Describe("Catalog", Label("catalog"), func() {
 		))
 	})
 
-	It("should publish the HA plan for the Redis service", func() {
+	It("should publish the HA plan for the DCS service", func() {
 		catalog, err := broker.Catalog()
 		Expect(err).NotTo(HaveOccurred())
 
-		service := testframework.FindService(catalog, "csb-hcs-redis")
+		service := testframework.FindService(catalog, "csb-hcs-dcs")
 		Expect(service.Plans).To(ContainElement(
 			MatchFields(IgnoreExtras, Fields{
 				Name: Equal("ha-large"),
-				ID:   Equal(redisHAPlanID),
+				ID:   Equal(dcsHAPlanID),
 			}),
 		))
 	})
 
-	It("should publish inline plans for the Redis service", func() {
+	It("should publish inline plans for the DCS service", func() {
 		catalog, err := broker.Catalog()
 		Expect(err).NotTo(HaveOccurred())
 
-		service := testframework.FindService(catalog, "csb-hcs-redis")
+		service := testframework.FindService(catalog, "csb-hcs-dcs")
 		Expect(service.Plans).To(ConsistOf(
 			MatchFields(IgnoreExtras, Fields{
 				Name: Equal("small"),
-				ID:   Equal(redisSmallPlanID),
+				ID:   Equal(dcsSmallPlanID),
 			}),
 			MatchFields(IgnoreExtras, Fields{
 				Name: Equal("medium"),
-				ID:   Equal(redisMediumPlanID),
+				ID:   Equal(dcsMediumPlanID),
 			}),
 			MatchFields(IgnoreExtras, Fields{
 				Name: Equal("large"),
-				ID:   Equal(redisLargePlanID),
+				ID:   Equal(dcsLargePlanID),
 			}),
 			MatchFields(IgnoreExtras, Fields{
 				Name: Equal("ha-large"),
-				ID:   Equal(redisHAPlanID),
+				ID:   Equal(dcsHAPlanID),
 			}),
 		))
 	})
@@ -93,18 +93,18 @@ var _ = Describe("Catalog", Label("catalog"), func() {
 		catalog, err := broker.Catalog()
 		Expect(err).NotTo(HaveOccurred())
 
-		Expect(testframework.FindService(catalog, "csb-hcs-postgresql").Plans).To(ConsistOf(
+		Expect(testframework.FindService(catalog, "csb-hcs-rds-postgresql").Plans).To(ConsistOf(
 			MatchFields(IgnoreExtras, Fields{
 				Name: Equal("small"),
-				ID:   Equal(postgresSmallPlanID),
+				ID:   Equal(rdsPostgresSmallPlanID),
 			}),
 			MatchFields(IgnoreExtras, Fields{
 				Name: Equal("medium"),
-				ID:   Equal(postgresMediumPlanID),
+				ID:   Equal(rdsPostgresMediumPlanID),
 			}),
 			MatchFields(IgnoreExtras, Fields{
 				Name: Equal("large"),
-				ID:   Equal(postgresLargePlanID),
+				ID:   Equal(rdsPostgresLargePlanID),
 			}),
 		))
 		Expect(testframework.FindService(catalog, "csb-hcs-elb").Plans).To(ConsistOf(

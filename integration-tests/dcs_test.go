@@ -6,9 +6,9 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-const redisServiceName = "csb-hcs-redis"
+const dcsServiceName = "csb-hcs-dcs"
 
-var _ = Describe("Redis", Label("redis"), func() {
+var _ = Describe("DCS", Label("dcs"), func() {
 	BeforeEach(func() {
 		Expect(mockTerraform.SetTFState([]testframework.TFStateValue{})).To(Succeed())
 	})
@@ -18,7 +18,7 @@ var _ = Describe("Redis", Label("redis"), func() {
 	})
 
 	It("should provision with defaults", func() {
-		instanceID, err := broker.Provision(redisServiceName, "small", map[string]any{
+		instanceID, err := broker.Provision(dcsServiceName, "small", map[string]any{
 			"availability_zone": "az1",
 			"vpc_id":            "fake-vpc-id",
 			"subnet_name":       "subnet-default",
@@ -27,7 +27,7 @@ var _ = Describe("Redis", Label("redis"), func() {
 		Expect(err).NotTo(HaveOccurred())
 		Expect(mockTerraform.FirstTerraformInvocationVars()).To(
 			SatisfyAll(
-				HaveKeyWithValue("instance_name", "csb-redis-"+instanceID),
+				HaveKeyWithValue("instance_name", "csb-dcs-"+instanceID),
 				HaveKeyWithValue("capacity", float64(0.125)),
 				HaveKeyWithValue("cache_mode", "single"),
 				HaveKeyWithValue("engine_version", "5.0"),
@@ -45,7 +45,7 @@ var _ = Describe("Redis", Label("redis"), func() {
 	})
 
 	It("should not allow changing of plan defined properties", func() {
-		_, err := broker.Provision(redisServiceName, "medium", map[string]any{
+		_, err := broker.Provision(dcsServiceName, "medium", map[string]any{
 			"availability_zone": "az1",
 			"vpc_id":            "fake-vpc-id",
 			"subnet_name":       "subnet-default",
@@ -66,7 +66,7 @@ var _ = Describe("Redis", Label("redis"), func() {
 			{Name: "cloud", Type: "string", Value: fakeCloud},
 		})).To(Succeed())
 
-		instanceID, err := broker.Provision(redisServiceName, "small", map[string]any{
+		instanceID, err := broker.Provision(dcsServiceName, "small", map[string]any{
 			"availability_zone": "az1",
 			"vpc_id":            "fake-vpc-id",
 			"subnet_name":       "subnet-default",
@@ -81,7 +81,7 @@ var _ = Describe("Redis", Label("redis"), func() {
 			{Name: "uri", Type: "string", Value: "redis://:fake-redis-password@fake-dcs-domain:6379/"},
 		})).To(Succeed())
 
-		creds, err := broker.Bind(redisServiceName, "small", instanceID, nil)
+		creds, err := broker.Bind(dcsServiceName, "small", instanceID, nil)
 		Expect(err).NotTo(HaveOccurred())
 		Expect(creds).To(
 			SatisfyAll(

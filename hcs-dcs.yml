@@ -1,8 +1,8 @@
 version: 1
-name: csb-hcs-redis
+name: csb-hcs-dcs
 id: b23276b5-f48a-4562-b4d1-5606ad0e63d8
-description: CSB HCS DCS for Redis
-display_name: CSB HCS DCS for Redis
+description: CSB HCS Distributed Cache Service (Redis engine)
+display_name: CSB HCS DCS
 image_url: file://service-images/csb.png
 documentation_url: https://doc.hcs.huawei.com/index.html
 provider_display_name: Huawei Cloud Stack
@@ -67,7 +67,7 @@ provision:
   - field_name: instance_name
     type: string
     details: Name of the DCS instance.
-    default: csb-redis-${request.instance_id}
+    default: csb-dcs-${request.instance_id}
     constraints:
       minLength: 4
       maxLength: 64
@@ -132,12 +132,12 @@ provision:
     overwrite: true
     type: object
   template_refs:
-    main: terraform/redis/provision/main.tf
-    variables: terraform/redis/provision/variables.tf
-    outputs: terraform/redis/provision/outputs.tf
-    provider: terraform/redis/provision/provider.tf
-    versions: terraform/redis/provision/versions.tf
-    data: terraform/redis/provision/data.tf
+    main: terraform/dcs/provision/main.tf
+    variables: terraform/dcs/provision/variables.tf
+    outputs: terraform/dcs/provision/outputs.tf
+    provider: terraform/dcs/provision/provider.tf
+    versions: terraform/dcs/provision/versions.tf
+    data: terraform/dcs/provision/data.tf
   outputs:
   - field_name: instance_id
     type: string
@@ -189,11 +189,11 @@ bind:
     overwrite: true
     type: string
   template_refs:
-    main: terraform/redis/bind/main.tf
-    variables: terraform/redis/bind/variables.tf
-    outputs: terraform/redis/bind/outputs.tf
-    provider: terraform/redis/bind/provider.tf
-    versions: terraform/redis/bind/versions.tf
+    main: terraform/dcs/bind/main.tf
+    variables: terraform/dcs/bind/variables.tf
+    outputs: terraform/dcs/bind/outputs.tf
+    provider: terraform/dcs/bind/provider.tf
+    versions: terraform/dcs/bind/versions.tf
   outputs:
   - field_name: host
     type: string

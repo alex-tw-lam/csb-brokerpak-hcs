@@ -7,9 +7,9 @@ import (
 	. "github.com/onsi/gomega/gstruct"
 )
 
-const postgresServiceName = "csb-hcs-postgresql"
+const rdsPostgresServiceName = "csb-hcs-rds-postgresql"
 
-var _ = Describe("PostgreSQL", Label("postgresql"), func() {
+var _ = Describe("RDS for PostgreSQL", Label("rds-postgresql"), func() {
 	BeforeEach(func() {
 		Expect(mockTerraform.SetTFState([]testframework.TFStateValue{})).To(Succeed())
 	})
@@ -19,7 +19,7 @@ var _ = Describe("PostgreSQL", Label("postgresql"), func() {
 	})
 
 	It("should provision with defaults", func() {
-		instanceID, err := broker.Provision(postgresServiceName, "small", map[string]any{
+		instanceID, err := broker.Provision(rdsPostgresServiceName, "small", map[string]any{
 			"storage_gb":         100,
 			"availability_zones": []any{"az1"},
 			"vpc_id":             "fake-vpc-id",
@@ -30,7 +30,7 @@ var _ = Describe("PostgreSQL", Label("postgresql"), func() {
 		Expect(err).NotTo(HaveOccurred())
 		Expect(mockTerraform.FirstTerraformInvocationVars()).To(
 			SatisfyAll(
-				HaveKeyWithValue("instance_name", "csb-postgresql-"+instanceID),
+				HaveKeyWithValue("instance_name", "csb-rds-postgresql-"+instanceID),
 				HaveKeyWithValue("flavor", "rds.pg.n1.large.2"),
 				HaveKeyWithValue("pg_version", "12"),
 				HaveKeyWithValue("storage_gb", float64(100)),
@@ -54,7 +54,7 @@ var _ = Describe("PostgreSQL", Label("postgresql"), func() {
 	})
 
 	It("should not allow changing of plan defined properties", func() {
-		_, err := broker.Provision(postgresServiceName, "small", map[string]any{
+		_, err := broker.Provision(rdsPostgresServiceName, "small", map[string]any{
 			"storage_gb":         100,
 			"availability_zones": []any{"az1"},
 			"vpc_id":             "fake-vpc-id",
@@ -68,7 +68,7 @@ var _ = Describe("PostgreSQL", Label("postgresql"), func() {
 
 	DescribeTable("property constraints",
 		func(params map[string]any, expectedErrorMsg string) {
-			_, err := broker.Provision(postgresServiceName, "small", params)
+			_, err := broker.Provision(rdsPostgresServiceName, "small", params)
 
 			Expect(err).To(MatchError(ContainSubstring(expectedErrorMsg)))
 		},
@@ -121,7 +121,7 @@ var _ = Describe("PostgreSQL", Label("postgresql"), func() {
 			{Name: "cloud", Type: "string", Value: fakeCloud},
 		})).To(Succeed())
 
-		instanceID, err := broker.Provision(postgresServiceName, "small", map[string]any{
+		instanceID, err := broker.Provision(rdsPostgresServiceName, "small", map[string]any{
 			"storage_gb":         100,
 			"availability_zones": []any{"az1"},
 			"vpc_id":             "fake-vpc-id",
@@ -140,7 +140,7 @@ var _ = Describe("PostgreSQL", Label("postgresql"), func() {
 			{Name: "jdbcUrl", Type: "string", Value: "jdbc:postgresql://192.168.1.20:5432/postgres"},
 		})).To(Succeed())
 
-		creds, err := broker.Bind(postgresServiceName, "small", instanceID, map[string]any{
+		creds, err := broker.Bind(rdsPostgresServiceName, "small", instanceID, map[string]any{
 			"user_name": "appuser",
 		})
 		Expect(err).NotTo(HaveOccurred())

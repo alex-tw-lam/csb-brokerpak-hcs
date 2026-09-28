@@ -1,5 +1,5 @@
 version: 1
-name: csb-hcs-postgresql
+name: csb-hcs-rds-postgresql
 id: 41f4eae4-99c4-4cbb-8f44-bd94bc77829f
 description: CSB HCS RDS for PostgreSQL
 display_name: CSB HCS RDS for PostgreSQL
@@ -32,12 +32,12 @@ provision:
   plan_inputs:
   - field_name: flavor
     type: string
-    details: RDS flavor spec code. Single-node flavors have no suffix, HA flavors an ".ha" suffix and require two availability zones. Flavor codes are site-specific; operators can override the plans via the GSB_SERVICE_CSB_HCS_POSTGRESQL_PLANS environment variable.
+    details: RDS flavor spec code. Single-node flavors have no suffix, HA flavors an ".ha" suffix and require two availability zones. Flavor codes are site-specific; operators can override the plans via the GSB_SERVICE_CSB_HCS_RDS_POSTGRESQL_PLANS environment variable.
   user_inputs:
   - field_name: instance_name
     type: string
     details: Name of the RDS instance.
-    default: csb-postgresql-${request.instance_id}
+    default: csb-rds-postgresql-${request.instance_id}
     constraints:
       minLength: 4
       maxLength: 64
@@ -137,12 +137,12 @@ provision:
     overwrite: true
     type: object
   template_refs:
-    main: terraform/postgresql/provision/main.tf
-    variables: terraform/postgresql/provision/variables.tf
-    outputs: terraform/postgresql/provision/outputs.tf
-    provider: terraform/postgresql/provision/provider.tf
-    versions: terraform/postgresql/provision/versions.tf
-    data: terraform/postgresql/provision/data.tf
+    main: terraform/rds-postgresql/provision/main.tf
+    variables: terraform/rds-postgresql/provision/variables.tf
+    outputs: terraform/rds-postgresql/provision/outputs.tf
+    provider: terraform/rds-postgresql/provision/provider.tf
+    versions: terraform/rds-postgresql/provision/versions.tf
+    data: terraform/rds-postgresql/provision/data.tf
   outputs:
   - field_name: instance_id
     type: string
@@ -212,12 +212,12 @@ bind:
     overwrite: true
     type: string
   template_refs:
-    main: terraform/postgresql/bind/main.tf
-    variables: terraform/postgresql/bind/variables.tf
-    outputs: terraform/postgresql/bind/outputs.tf
-    provider: terraform/postgresql/bind/provider.tf
-    versions: terraform/postgresql/bind/versions.tf
-    data: terraform/postgresql/bind/data.tf
+    main: terraform/rds-postgresql/bind/main.tf
+    variables: terraform/rds-postgresql/bind/variables.tf
+    outputs: terraform/rds-postgresql/bind/outputs.tf
+    provider: terraform/rds-postgresql/bind/provider.tf
+    versions: terraform/rds-postgresql/bind/versions.tf
+    data: terraform/rds-postgresql/bind/data.tf
   outputs:
   - field_name: username
     type: string
