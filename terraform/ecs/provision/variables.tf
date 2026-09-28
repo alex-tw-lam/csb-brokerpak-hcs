@@ -13,14 +13,20 @@ variable "instance_name" {
   type        = string
 }
 
+variable "flavor" {
+  description = "ECS flavor spec code from the plan; auto-resolved when empty."
+  type        = string
+  default     = null
+}
+
 variable "cores" {
-  description = "Number of vCPUs used for the flavor lookup."
+  description = "Number of vCPUs used for the automatic flavor lookup."
   type        = number
   default     = 2
 }
 
 variable "memory_gb" {
-  description = "Memory in GB used for the flavor lookup."
+  description = "Memory in GB used for the automatic flavor lookup."
   type        = number
   default     = 4
 }
@@ -33,12 +39,6 @@ variable "image_name" {
 variable "availability_zone" {
   description = "Availability zone to place the instance in."
   type        = string
-}
-
-variable "flavor_id" {
-  description = "Explicit ECS flavor ID overriding the cores/memory lookup."
-  type        = string
-  default     = null
 }
 
 variable "vpc_id" {

@@ -6,5 +6,9 @@ terraform {
       source  = "huaweicloud/hcs"
       version = "2.4.28"
     }
+    random = {
+      source  = "registry.terraform.io/hashicorp/random"
+      version = "3.9.0"
+    }
   }
 }

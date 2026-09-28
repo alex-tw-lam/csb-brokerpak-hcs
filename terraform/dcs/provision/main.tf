@@ -11,7 +11,7 @@ resource "hcs_dcs_instance" "instance" {
   engine             = "Redis"
   engine_version     = var.engine_version
   capacity           = var.capacity
-  flavor             = data.hcs_dcs_flavors.flavors.flavors[0].name
+  flavor             = local.flavor
   availability_zones = local.availability_zones
 
   vpc_id    = var.vpc_id

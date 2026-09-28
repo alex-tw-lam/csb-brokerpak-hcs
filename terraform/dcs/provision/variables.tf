@@ -13,6 +13,12 @@ variable "instance_name" {
   type        = string
 }
 
+variable "flavor" {
+  description = "DCS flavor spec code from the plan; auto-resolved when empty."
+  type        = string
+  default     = null
+}
+
 variable "capacity" {
   description = "Cache capacity in GB."
   type        = number

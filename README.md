@@ -43,9 +43,9 @@ HCS 8.3.1/8.5.x).
 
 | Service | Name | Plans | Bind credentials |
 |---|---|---|---|
-| ECS compute instance | `csb-hcs-ecs` | inline: small/medium/large (cores/memory; flavor auto-resolved) | instance addresses |
+| ECS compute instance | `csb-hcs-ecs` | inline: small/medium/large (`s6.*` flavor codes; cores/memory fallback) | instance addresses |
 | RDS for PostgreSQL | `csb-hcs-rds-postgresql` | inline: small (single node), medium/large (primary/standby) | per-binding DB account (`username`/`password`/`hostname`/`port`/`uri`/`jdbcUrl`) |
-| DCS (Redis engine) | `csb-hcs-dcs` | inline: small/medium/large single-node + ha-large (capacity; flavor auto-resolved) | `host`/`port`/`password`/`uri` |
+| DCS (Redis engine) | `csb-hcs-dcs` | inline: small/medium/large single-node + ha-large (flavor-based) | per-binding DCS account: `username`/`password`/`host`/`port`/`uri` |
 | Elastic Load Balance | `csb-hcs-elb` | operator-configured (ELB flavor IDs are site-specific) | VIP/EIP + listener |
 | GaussDB (openGauss) | `csb-hcs-gaussdb` | inline: small (centralized HA), medium/large (distributed) | administrator credentials + endpoints |
 | CSMS secret | `csb-hcs-csms` | inline: `default` | secret name/value/version |

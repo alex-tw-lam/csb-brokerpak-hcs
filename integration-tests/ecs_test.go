@@ -34,6 +34,7 @@ var _ = Describe("ECS", Label("ecs"), func() {
 				HaveKeyWithValue("availability_zone", "az1"),
 				HaveKeyWithValue("vpc_id", "fake-vpc-id"),
 				HaveKeyWithValue("subnet_name", "subnet-default"),
+				HaveKeyWithValue("flavor", "s6.large.2"),
 				HaveKeyWithValue("cores", float64(2)),
 				HaveKeyWithValue("memory_gb", float64(4)),
 				HaveKeyWithValue("security_group_names", ConsistOf("default")),
@@ -58,7 +59,6 @@ var _ = Describe("ECS", Label("ecs"), func() {
 			"availability_zone": "az2.dc1",
 			"vpc_id":            "fake-vpc-id",
 			"subnet_name":       "subnet-app",
-			"flavor_id":         "s6.large.2",
 			"system_disk_size":  100,
 			"allocate_eip":      true,
 			"bandwidth_size":    10,
@@ -68,9 +68,9 @@ var _ = Describe("ECS", Label("ecs"), func() {
 		Expect(err).NotTo(HaveOccurred())
 		Expect(mockTerraform.FirstTerraformInvocationVars()).To(
 			SatisfyAll(
-				HaveKeyWithValue("cores", float64(4)),
-				HaveKeyWithValue("memory_gb", float64(8)),
-				HaveKeyWithValue("flavor_id", "s6.large.2"),
+				HaveKeyWithValue("flavor", "s6.xlarge.2"),
+				HaveKeyWithValue("cores", float64(2)),
+				HaveKeyWithValue("memory_gb", float64(4)),
 				HaveKeyWithValue("system_disk_size", float64(100)),
 				HaveKeyWithValue("allocate_eip", true),
 				HaveKeyWithValue("bandwidth_size", float64(10)),
@@ -85,10 +85,10 @@ var _ = Describe("ECS", Label("ecs"), func() {
 			"availability_zone": "az1",
 			"vpc_id":            "fake-vpc-id",
 			"subnet_name":       "subnet-default",
-			"cores":             16,
+			"flavor":            "s6.2xlarge.2",
 		})
 
-		Expect(err).To(MatchError(ContainSubstring("plan defined properties cannot be changed: cores")))
+		Expect(err).To(MatchError(ContainSubstring("plan defined properties cannot be changed: flavor")))
 	})
 
 	DescribeTable("property constraints",

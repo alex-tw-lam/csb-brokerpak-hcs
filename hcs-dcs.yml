@@ -36,14 +36,18 @@ plans:
     engine_version: "5.0"
 - name: ha-large
   id: 8ec947fc-c1d0-4c98-b243-1c97b1ff6b4e
-  description: Master/standby Redis 5.0 cache with 4GB capacity; requires a standby availability zone
+  description: Master/standby Redis 5.0 cache (flavor redis.ha.xu1.large.r2.4, 4GB capacity); requires a standby availability zone
   display_name: HA Large (master/standby, 4GB)
   properties:
+    flavor: redis.ha.xu1.large.r2.4
     capacity: 4
     cache_mode: ha
     engine_version: "5.0"
 provision:
   plan_inputs:
+  - field_name: flavor
+    type: string
+    details: DCS flavor spec code (site-specific). When a plan does not set a flavor, one is looked up automatically from `capacity`, `cache_mode` and `engine_version`.
   - field_name: capacity
     type: number
     details: Cache capacity in GB (discrete values per cache mode; the matching DCS flavor is looked up automatically).
@@ -162,7 +166,24 @@ provision:
     details: HCS cloud domain
 bind:
   plan_inputs: []
-  user_inputs: []
+  user_inputs:
+  - field_name: account_name
+    type: string
+    details: |
+      Name of the DCS account created for this binding (hyphens are converted to
+      underscores). Requires an instance whose engine version supports accounts.
+    default: csb-${str.truncate(16, request.binding_id)}
+    constraints:
+      minLength: 1
+      maxLength: 63
+      pattern: ^[a-zA-Z][a-zA-Z0-9_-]*$
+  - field_name: account_role
+    type: string
+    details: Privilege of the binding account.
+    default: write
+    enum:
+      read: read-only
+      write: read and write
   computed_inputs:
   - name: instance_id
     default: ${instance.details["instance_id"]}
@@ -176,10 +197,6 @@ bind:
     default: ${instance.details["port"]}
     overwrite: true
     type: number
-  - name: password
-    default: ${instance.details["password"]}
-    overwrite: true
-    type: string
   - name: region
     default: ${instance.details["region"]}
     overwrite: true
@@ -194,16 +211,20 @@ bind:
     outputs: terraform/dcs/bind/outputs.tf
     provider: terraform/dcs/bind/provider.tf
     versions: terraform/dcs/bind/versions.tf
+    data: terraform/dcs/bind/data.tf
   outputs:
+  - field_name: username
+    type: string
+    details: Username of the binding account
+  - field_name: password
+    type: string
+    details: Randomly generated password of the binding account
   - field_name: host
     type: string
     details: Connection domain name of the instance
   - field_name: port
     type: number
     details: Connection port
-  - field_name: password
-    type: string
-    details: Instance access password
   - field_name: uri
     type: string
     details: Connection URI
