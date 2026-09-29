@@ -27,7 +27,6 @@ var _ = Describe("Catalog", Label("catalog"), func() {
 			Expect(service.ID).To(Equal(id), "unexpected id for %s", name)
 			Expect(service.Tags).To(ContainElement("hcs"), "expected hcs tag for %s", name)
 			Expect(service.Metadata.DisplayName).NotTo(BeEmpty(), "expected display name for %s", name)
-			Expect(service.Metadata.ImageUrl).To(ContainSubstring("data:image/png;base64,"), "expected inlined image for %s", name)
 		}
 	})
 

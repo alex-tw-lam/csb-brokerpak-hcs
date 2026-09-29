@@ -3,7 +3,7 @@ name: csb-hcs-dcs
 id: b23276b5-f48a-4562-b4d1-5606ad0e63d8
 description: CSB HCS Distributed Cache Service (Redis engine)
 display_name: CSB HCS DCS
-image_url: file://service-images/csb.png
+image_url: https://doc.hcs.huawei.com/index.html
 documentation_url: https://doc.hcs.huawei.com/index.html
 provider_display_name: Huawei Cloud Stack
 support_url: https://doc.hcs.huawei.com/index.html

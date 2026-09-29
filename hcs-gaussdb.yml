@@ -3,7 +3,7 @@ name: csb-hcs-gaussdb
 id: a48c4633-3397-4895-9caf-36690a12a368
 description: CSB HCS GaussDB (for openGauss)
 display_name: CSB HCS GaussDB (for openGauss)
-image_url: file://service-images/csb.png
+image_url: https://doc.hcs.huawei.com/index.html
 documentation_url: https://doc.hcs.huawei.com/index.html
 provider_display_name: Huawei Cloud Stack
 support_url: https://doc.hcs.huawei.com/index.html

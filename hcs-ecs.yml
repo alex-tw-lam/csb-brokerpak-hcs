@@ -3,7 +3,7 @@ name: csb-hcs-ecs
 id: be7bfe87-da52-4ebe-b446-df08b0345211
 description: CSB HCS ECS Instance
 display_name: CSB HCS ECS Instance
-image_url: file://service-images/csb.png
+image_url: https://doc.hcs.huawei.com/index.html
 documentation_url: https://doc.hcs.huawei.com/index.html
 provider_display_name: Huawei Cloud Stack
 support_url: https://doc.hcs.huawei.com/index.html

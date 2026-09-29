@@ -3,7 +3,7 @@ name: csb-hcs-obs
 id: 13dcaab5-7831-4f0a-b296-fe582294ea32
 description: CSB HCS OBS Bucket
 display_name: CSB HCS OBS Bucket
-image_url: file://service-images/csb.png
+image_url: https://doc.hcs.huawei.com/index.html
 documentation_url: https://doc.hcs.huawei.com/index.html
 provider_display_name: Huawei Cloud Stack
 support_url: https://doc.hcs.huawei.com/index.html

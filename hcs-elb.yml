@@ -3,7 +3,7 @@ name: csb-hcs-elb
 id: 3e6f427f-228d-4bd8-a1a1-ffc25acf6edf
 description: CSB HCS Elastic Load Balance
 display_name: CSB HCS Elastic Load Balance
-image_url: file://service-images/csb.png
+image_url: https://doc.hcs.huawei.com/index.html
 documentation_url: https://doc.hcs.huawei.com/index.html
 provider_display_name: Huawei Cloud Stack
 support_url: https://doc.hcs.huawei.com/index.html

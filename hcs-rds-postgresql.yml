@@ -3,7 +3,7 @@ name: csb-hcs-rds-postgresql
 id: 41f4eae4-99c4-4cbb-8f44-bd94bc77829f
 description: CSB HCS RDS for PostgreSQL
 display_name: CSB HCS RDS for PostgreSQL
-image_url: file://service-images/csb.png
+image_url: https://doc.hcs.huawei.com/index.html
 documentation_url: https://doc.hcs.huawei.com/index.html
 provider_display_name: Huawei Cloud Stack
 support_url: https://doc.hcs.huawei.com/index.html
