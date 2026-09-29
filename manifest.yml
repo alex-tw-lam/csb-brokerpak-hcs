@@ -30,9 +30,13 @@ env_config_mapping:
   HCS_DOMAIN_NAME: hcs.domain_name
   HCS_AUTH_URL: hcs.auth_url
   HCS_VPC_ID: hcs.vpc_id
-  HCS_SUBNET_NAME: hcs.subnet_name
-  HCS_SECURITY_GROUP_ID: hcs.security_group_id
-  HCS_SECURITY_GROUP_NAME: hcs.security_group_name
+  HCS_ECS_SUBNET_NAME: hcs.ecs.subnet_name
+  HCS_ECS_SECURITY_GROUP_NAME: hcs.ecs.security_group_name
+  HCS_RDS_POSTGRESQL_SUBNET_NAME: hcs.rds_postgresql.subnet_name
+  HCS_RDS_POSTGRESQL_SECURITY_GROUP_ID: hcs.rds_postgresql.security_group_id
+  HCS_DCS_SUBNET_NAME: hcs.dcs.subnet_name
+  HCS_ELB_SUBNET_NAME: hcs.elb.subnet_name
+  HCS_GAUSSDB_SUBNET_NAME: hcs.gaussdb.subnet_name
 service_definitions:
 - hcs-ecs.yml
 - hcs-rds-postgresql.yml

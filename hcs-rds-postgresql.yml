@@ -96,13 +96,13 @@ provision:
     prohibit_update: true
   - field_name: subnet_name
     type: string
-    details: Name of an existing subnet within `vpc_id`. Defaults to the site configuration (HCS_SUBNET_NAME); can be overridden per instance.
-    default: ${config("hcs.subnet_name")}
+    details: Name of an existing subnet within `vpc_id`. Defaults to the site configuration (HCS_RDS_POSTGRESQL_SUBNET_NAME); can be overridden per instance.
+    default: ${config("hcs.rds_postgresql.subnet_name")}
     prohibit_update: true
   - field_name: security_group_id
     type: string
-    details: ID of an existing security group controlling access to the instance. Defaults to the site configuration (HCS_SECURITY_GROUP_ID); can be overridden per instance.
-    default: ${config("hcs.security_group_id")}
+    details: ID of an existing security group controlling access to the instance. Defaults to the site configuration (HCS_RDS_POSTGRESQL_SECURITY_GROUP_ID); can be overridden per instance.
+    default: ${config("hcs.rds_postgresql.security_group_id")}
   - field_name: admin_password
     type: string
     nullable: true

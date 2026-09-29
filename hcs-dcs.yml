@@ -94,8 +94,8 @@ provision:
     prohibit_update: true
   - field_name: subnet_name
     type: string
-    details: Name of an existing subnet within `vpc_id`. Defaults to the site configuration (HCS_SUBNET_NAME); can be overridden per instance.
-    default: ${config("hcs.subnet_name")}
+    details: Name of an existing subnet within `vpc_id`. Defaults to the site configuration (HCS_DCS_SUBNET_NAME); can be overridden per instance.
+    default: ${config("hcs.dcs.subnet_name")}
     prohibit_update: true
   - field_name: security_group_id
     type: string

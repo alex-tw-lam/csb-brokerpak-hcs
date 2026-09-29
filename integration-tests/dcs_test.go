@@ -33,7 +33,7 @@ var _ = Describe("DCS", Label("dcs"), func() {
 				HaveKeyWithValue("availability_zone", "az1"),
 				HaveKeyWithValue("standby_availability_zone", BeNil()),
 				HaveKeyWithValue("vpc_id", fakeVPCID),
-				HaveKeyWithValue("subnet_name", fakeSubnetName),
+				HaveKeyWithValue("subnet_name", fakeDCSSubnetName),
 				HaveKeyWithValue("security_group_id", BeNil()),
 				HaveKeyWithValue("port", float64(6379)),
 				HaveKeyWithValue("password", BeNil()),

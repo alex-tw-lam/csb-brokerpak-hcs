@@ -47,20 +47,25 @@ broker config keys (`env_config_mapping`), which is what the per-service
 
 ### Site network defaults
 
-Configure these once per site and every service picks them up as defaults; each can
-still be overridden per service instance at provision time.
+One shared VPC plus a dedicated subnet and security group per service. Configure these
+once per site and every service picks up its own defaults; each can still be overridden
+per service instance at provision time.
 
-| Variable | Used by | Description |
+| Variable | Config key | Used by |
 |---|---|---|
-| `HCS_VPC_ID` | ecs, rds-postgresql, dcs, elb, gaussdb | Default VPC ID for the instance network |
-| `HCS_SUBNET_NAME` | ecs, rds-postgresql, dcs, elb, gaussdb | Default subnet name within the VPC |
-| `HCS_SECURITY_GROUP_ID` | rds-postgresql (required input), dcs/gaussdb (optional input) | Default security group ID |
-| `HCS_SECURITY_GROUP_NAME` | ecs | Default security group name to attach |
+| `HCS_VPC_ID` | `hcs.vpc_id` | ecs, rds-postgresql, dcs, elb, gaussdb (shared VPC) |
+| `HCS_ECS_SUBNET_NAME` | `hcs.ecs.subnet_name` | ecs |
+| `HCS_ECS_SECURITY_GROUP_NAME` | `hcs.ecs.security_group_name` | ecs |
+| `HCS_RDS_POSTGRESQL_SUBNET_NAME` | `hcs.rds_postgresql.subnet_name` | rds-postgresql |
+| `HCS_RDS_POSTGRESQL_SECURITY_GROUP_ID` | `hcs.rds_postgresql.security_group_id` | rds-postgresql |
+| `HCS_DCS_SUBNET_NAME` | `hcs.dcs.subnet_name` | dcs |
+| `HCS_ELB_SUBNET_NAME` | `hcs.elb.subnet_name` | elb |
+| `HCS_GAUSSDB_SUBNET_NAME` | `hcs.gaussdb.subnet_name` | gaussdb |
 
-These map to broker config keys (`hcs.vpc_id`, `hcs.subnet_name`,
-`hcs.security_group_id`, `hcs.security_group_name`) via the manifest's
-`env_config_mapping`, so they can also be set in the CSB config file instead of the
-environment.
+The optional security group inputs on `csb-hcs-dcs` (Redis 3.0 only) and
+`csb-hcs-gaussdb` (custom port only) remain per-instance parameters. All keys can also
+be set in the CSB config file instead of the environment via the manifest's
+`env_config_mapping`.
 
 If your site's service endpoint hostnames do not follow the
 `<service>.<region>.<cloud>` convention, set the provider `endpoints` map — this
@@ -114,8 +119,8 @@ Notes:
 | `system_disk_type` | ecs | e.g. `business_type_01` — HCS disk type catalog differs per site |
 | `eip_iptype` | ecs, elb | e.g. `5_bgp`/`5_sbgp` or site network name |
 | `availability_zone`/`availability_zones` | all | Site AZ naming (e.g. `az1.dc1`) — per-instance input |
-| `vpc_id` + `subnet_name` | ecs, rds-postgresql, dcs, elb, gaussdb | Defaulted from the site network configuration above; subnets are resolved via `hcs_vpc_subnets` |
-| `security_group_id`/`security_group_name` | rds-postgresql (defaulted), dcs/gaussdb (optional), ecs (defaulted) | Existing security groups |
+| `vpc_id` + `subnet_name` | ecs, rds-postgresql, dcs, elb, gaussdb | Defaulted per service from the site network configuration above; subnets are resolved via `hcs_vpc_subnets` |
+| `security_group_id`/`security_group_name` | rds-postgresql (defaulted), ecs (defaulted), dcs/gaussdb (optional, per-instance) | Existing security groups |
 
 ## Service-specific behavior
 

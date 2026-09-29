@@ -37,7 +37,7 @@ var _ = Describe("GaussDB", Label("gaussdb"), func() {
 				HaveKeyWithValue("volume_size", float64(480)),
 				HaveKeyWithValue("port", "8000"),
 				HaveKeyWithValue("vpc_id", fakeVPCID),
-				HaveKeyWithValue("subnet_name", fakeSubnetName),
+				HaveKeyWithValue("subnet_name", fakeGaussdbSubnetName),
 				HaveKeyWithValue("security_group_id", BeNil()),
 				HaveKeyWithValue("sharding_num", float64(3)),
 				HaveKeyWithValue("coordinator_num", float64(3)),

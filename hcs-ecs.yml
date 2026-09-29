@@ -65,13 +65,13 @@ provision:
     prohibit_update: true
   - field_name: subnet_name
     type: string
-    details: Name of an existing subnet within `vpc_id`. Defaults to the site configuration (HCS_SUBNET_NAME); can be overridden per instance.
-    default: ${config("hcs.subnet_name")}
+    details: Name of an existing subnet within `vpc_id`. Defaults to the site configuration (HCS_ECS_SUBNET_NAME); can be overridden per instance.
+    default: ${config("hcs.ecs.subnet_name")}
     prohibit_update: true
   - field_name: security_group_name
     type: string
-    details: Name of an existing security group to attach. Defaults to the site configuration (HCS_SECURITY_GROUP_NAME).
-    default: ${config("hcs.security_group_name")}
+    details: Name of an existing security group to attach. Defaults to the site configuration (HCS_ECS_SECURITY_GROUP_NAME).
+    default: ${config("hcs.ecs.security_group_name")}
     prohibit_update: true
   - field_name: admin_pass
     type: string

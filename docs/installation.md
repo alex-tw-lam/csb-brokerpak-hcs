@@ -66,7 +66,8 @@ export SECURITY_USER_NAME=user SECURITY_USER_PASSWORD=pass
 export DB_TYPE=sqlite3 DB_PATH=/tmp/csb-hcs.db
 # plus the HCS_* variables from configuration.md
 # (credentials, cloud/region, and the site network defaults
-#  HCS_VPC_ID / HCS_SUBNET_NAME / HCS_SECURITY_GROUP_ID / HCS_SECURITY_GROUP_NAME)
+#  HCS_VPC_ID and the per-service HCS_*_SUBNET_NAME /
+#  HCS_*_SECURITY_GROUP_* variables)
 go run github.com/cloudfoundry/cloud-service-broker/v2 serve
 ```
 
