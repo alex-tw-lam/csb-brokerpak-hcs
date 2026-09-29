@@ -22,9 +22,6 @@ var _ = Describe("RDS for PostgreSQL", Label("rds-postgresql"), func() {
 		instanceID, err := broker.Provision(rdsPostgresServiceName, "small", map[string]any{
 			"storage_gb":         100,
 			"availability_zones": []any{"az1"},
-			"vpc_id":             "fake-vpc-id",
-			"subnet_name":        "subnet-default",
-			"security_group_id":  "fake-sg-id",
 		})
 
 		Expect(err).NotTo(HaveOccurred())
@@ -38,9 +35,9 @@ var _ = Describe("RDS for PostgreSQL", Label("rds-postgresql"), func() {
 				HaveKeyWithValue("availability_zones", ConsistOf("az1")),
 				HaveKeyWithValue("ha_replication_mode", "async"),
 				HaveKeyWithValue("port", float64(5432)),
-				HaveKeyWithValue("vpc_id", "fake-vpc-id"),
-				HaveKeyWithValue("subnet_name", "subnet-default"),
-				HaveKeyWithValue("security_group_id", "fake-sg-id"),
+				HaveKeyWithValue("vpc_id", fakeVPCID),
+				HaveKeyWithValue("subnet_name", fakeSubnetName),
+				HaveKeyWithValue("security_group_id", fakeSGID),
 				HaveKeyWithValue("admin_password", BeNil()),
 				HaveKeyWithValue("backup_start_time", "03:00-04:00"),
 				HaveKeyWithValue("backup_keep_days", float64(7)),
@@ -57,9 +54,6 @@ var _ = Describe("RDS for PostgreSQL", Label("rds-postgresql"), func() {
 		_, err := broker.Provision(rdsPostgresServiceName, "small", map[string]any{
 			"storage_gb":         100,
 			"availability_zones": []any{"az1"},
-			"vpc_id":             "fake-vpc-id",
-			"subnet_name":        "subnet-default",
-			"security_group_id":  "fake-sg-id",
 			"flavor":             "rds.pg.n1.xlarge.2.ha",
 		})
 
@@ -124,9 +118,6 @@ var _ = Describe("RDS for PostgreSQL", Label("rds-postgresql"), func() {
 		instanceID, err := broker.Provision(rdsPostgresServiceName, "small", map[string]any{
 			"storage_gb":         100,
 			"availability_zones": []any{"az1"},
-			"vpc_id":             "fake-vpc-id",
-			"subnet_name":        "subnet-default",
-			"security_group_id":  "fake-sg-id",
 		})
 		Expect(err).NotTo(HaveOccurred())
 

@@ -20,8 +20,6 @@ var _ = Describe("DCS", Label("dcs"), func() {
 	It("should provision with defaults", func() {
 		instanceID, err := broker.Provision(dcsServiceName, "small", map[string]any{
 			"availability_zone": "az1",
-			"vpc_id":            "fake-vpc-id",
-			"subnet_name":       "subnet-default",
 		})
 
 		Expect(err).NotTo(HaveOccurred())
@@ -34,8 +32,8 @@ var _ = Describe("DCS", Label("dcs"), func() {
 				HaveKeyWithValue("engine_version", "5.0"),
 				HaveKeyWithValue("availability_zone", "az1"),
 				HaveKeyWithValue("standby_availability_zone", BeNil()),
-				HaveKeyWithValue("vpc_id", "fake-vpc-id"),
-				HaveKeyWithValue("subnet_name", "subnet-default"),
+				HaveKeyWithValue("vpc_id", fakeVPCID),
+				HaveKeyWithValue("subnet_name", fakeSubnetName),
 				HaveKeyWithValue("security_group_id", BeNil()),
 				HaveKeyWithValue("port", float64(6379)),
 				HaveKeyWithValue("password", BeNil()),
@@ -48,8 +46,6 @@ var _ = Describe("DCS", Label("dcs"), func() {
 	It("should not allow changing of plan defined properties", func() {
 		_, err := broker.Provision(dcsServiceName, "medium", map[string]any{
 			"availability_zone": "az1",
-			"vpc_id":            "fake-vpc-id",
-			"subnet_name":       "subnet-default",
 			"capacity":          8,
 		})
 
@@ -69,8 +65,6 @@ var _ = Describe("DCS", Label("dcs"), func() {
 
 		instanceID, err := broker.Provision(dcsServiceName, "small", map[string]any{
 			"availability_zone": "az1",
-			"vpc_id":            "fake-vpc-id",
-			"subnet_name":       "subnet-default",
 		})
 		Expect(err).NotTo(HaveOccurred())
 

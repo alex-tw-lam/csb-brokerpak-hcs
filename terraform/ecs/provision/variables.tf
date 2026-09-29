@@ -51,9 +51,9 @@ variable "subnet_name" {
   type        = string
 }
 
-variable "security_group_names" {
-  description = "Names of the security groups to attach."
-  type        = list(string)
+variable "security_group_name" {
+  description = "Name of the security group to attach."
+  type        = string
 }
 
 variable "admin_pass" {

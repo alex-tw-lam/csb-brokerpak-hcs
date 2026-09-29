@@ -19,10 +19,7 @@ var _ = Describe("ELB", Label("elb"), func() {
 	})
 
 	It("should provision with defaults", func() {
-		instanceID, err := broker.Provision(elbServiceName, "default", map[string]any{
-			"vpc_id":      "fake-vpc-id",
-			"subnet_name": "subnet-default",
-		})
+		instanceID, err := broker.Provision(elbServiceName, "default", map[string]any{})
 
 		Expect(err).NotTo(HaveOccurred())
 		Expect(mockTerraform.FirstTerraformInvocationVars()).To(
@@ -30,8 +27,8 @@ var _ = Describe("ELB", Label("elb"), func() {
 				HaveKeyWithValue("loadbalancer_name", "csb-elb-"+instanceID),
 				HaveKeyWithValue("l4_flavor_id", "fake-l4-flavor"),
 				HaveKeyWithValue("l7_flavor_id", "fake-l7-flavor"),
-				HaveKeyWithValue("vpc_id", "fake-vpc-id"),
-				HaveKeyWithValue("subnet_name", "subnet-default"),
+				HaveKeyWithValue("vpc_id", fakeVPCID),
+				HaveKeyWithValue("subnet_name", fakeSubnetName),
 				HaveKeyWithValue("ipv4_address", BeNil()),
 				HaveKeyWithValue("listener_protocol", "TCP"),
 				HaveKeyWithValue("listener_port", float64(80)),
@@ -49,8 +46,6 @@ var _ = Describe("ELB", Label("elb"), func() {
 
 	It("should accept backend members and an explicit VIP", func() {
 		_, err := broker.Provision(elbServiceName, "default", map[string]any{
-			"vpc_id":            "fake-vpc-id",
-			"subnet_name":       "subnet-default",
 			"ipv4_address":      "192.168.1.100",
 			"listener_protocol": "TCP",
 			"listener_port":     443,
@@ -98,10 +93,7 @@ var _ = Describe("ELB", Label("elb"), func() {
 			{Name: "cloud", Type: "string", Value: fakeCloud},
 		})).To(Succeed())
 
-		instanceID, err := broker.Provision(elbServiceName, "default", map[string]any{
-			"vpc_id":      "fake-vpc-id",
-			"subnet_name": "subnet-default",
-		})
+		instanceID, err := broker.Provision(elbServiceName, "default", map[string]any{})
 		Expect(err).NotTo(HaveOccurred())
 
 		// The mock has a single TF state: switch it to the bind workspace outputs before binding.
@@ -162,10 +154,7 @@ var _ = Describe("ELB", Label("elb"), func() {
 			{Name: "cloud", Type: "string", Value: fakeCloud},
 		})).To(Succeed())
 
-		instanceID, err := broker.Provision(elbServiceName, "default", map[string]any{
-			"vpc_id":      "fake-vpc-id",
-			"subnet_name": "subnet-default",
-		})
+		instanceID, err := broker.Provision(elbServiceName, "default", map[string]any{})
 		Expect(err).NotTo(HaveOccurred())
 
 		_, err = broker.Bind(elbServiceName, "default", instanceID, nil)

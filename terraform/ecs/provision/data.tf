@@ -14,12 +14,12 @@ data "hcs_ecs_compute_flavors" "flavors" {
 }
 
 data "hcs_networking_secgroups" "secgroup" {
-  for_each = toset(var.security_group_names)
+  for_each = toset([var.security_group_name])
   name     = each.value
 }
 
 locals {
   flavor_id          = var.flavor != null && var.flavor != "" ? var.flavor : data.hcs_ecs_compute_flavors.flavors.ids[0]
-  security_group_ids = [for name in var.security_group_names : data.hcs_networking_secgroups.secgroup[name].security_groups[0].id]
+  security_group_ids = [for name in [var.security_group_name] : data.hcs_networking_secgroups.secgroup[name].security_groups[0].id]
   generated_password = var.admin_pass == null || var.admin_pass == "" ? random_password.admin_pass[0].result : var.admin_pass
 }

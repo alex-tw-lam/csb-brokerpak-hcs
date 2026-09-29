@@ -89,13 +89,13 @@ provision:
     prohibit_update: true
   - field_name: vpc_id
     type: string
-    required: true
-    details: ID of an existing VPC for the instance network.
+    details: ID of an existing VPC for the network. Defaults to the site configuration (HCS_VPC_ID); can be overridden per instance.
+    default: ${config("hcs.vpc_id")}
     prohibit_update: true
   - field_name: subnet_name
     type: string
-    required: true
-    details: Name of an existing subnet within `vpc_id`.
+    details: Name of an existing subnet within `vpc_id`. Defaults to the site configuration (HCS_SUBNET_NAME); can be overridden per instance.
+    default: ${config("hcs.subnet_name")}
     prohibit_update: true
   - field_name: security_group_id
     type: string

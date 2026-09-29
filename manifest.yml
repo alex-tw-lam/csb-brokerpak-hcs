@@ -29,6 +29,10 @@ env_config_mapping:
   HCS_REGION_NAME: hcs.region
   HCS_DOMAIN_NAME: hcs.domain_name
   HCS_AUTH_URL: hcs.auth_url
+  HCS_VPC_ID: hcs.vpc_id
+  HCS_SUBNET_NAME: hcs.subnet_name
+  HCS_SECURITY_GROUP_ID: hcs.security_group_id
+  HCS_SECURITY_GROUP_NAME: hcs.security_group_name
 service_definitions:
 - hcs-ecs.yml
 - hcs-rds-postgresql.yml

@@ -45,6 +45,23 @@ broker config keys (`env_config_mapping`), which is what the per-service
 | `HCS_AUTH_URL` | `https://iam-apigateway-proxy.hcs.example.com/v3` | Overrides the derived Keystone v3 endpoint |
 | `HCS_INSECURE` | `true` | Skip TLS verification (typical for HCS self-signed certs) |
 
+### Site network defaults
+
+Configure these once per site and every service picks them up as defaults; each can
+still be overridden per service instance at provision time.
+
+| Variable | Used by | Description |
+|---|---|---|
+| `HCS_VPC_ID` | ecs, rds-postgresql, dcs, elb, gaussdb | Default VPC ID for the instance network |
+| `HCS_SUBNET_NAME` | ecs, rds-postgresql, dcs, elb, gaussdb | Default subnet name within the VPC |
+| `HCS_SECURITY_GROUP_ID` | rds-postgresql (required input), dcs/gaussdb (optional input) | Default security group ID |
+| `HCS_SECURITY_GROUP_NAME` | ecs | Default security group name to attach |
+
+These map to broker config keys (`hcs.vpc_id`, `hcs.subnet_name`,
+`hcs.security_group_id`, `hcs.security_group_name`) via the manifest's
+`env_config_mapping`, so they can also be set in the CSB config file instead of the
+environment.
+
 If your site's service endpoint hostnames do not follow the
 `<service>.<region>.<cloud>` convention, set the provider `endpoints` map — this
 currently requires extending `provider.tf` in the service modules.
@@ -96,9 +113,9 @@ Notes:
 | `image_name` | ecs | Exact IMS image name, resolved via `hcs_ims_images` |
 | `system_disk_type` | ecs | e.g. `business_type_01` — HCS disk type catalog differs per site |
 | `eip_iptype` | ecs, elb | e.g. `5_bgp`/`5_sbgp` or site network name |
-| `availability_zone`/`availability_zones` | all | Site AZ naming (e.g. `az1.dc1`) |
-| `vpc_id` + `subnet_name` | all | Existing network; subnets are resolved via `hcs_vpc_subnets` |
-| `security_group_id(s)` | mysql, redis, gaussdb, ecs | Existing security groups |
+| `availability_zone`/`availability_zones` | all | Site AZ naming (e.g. `az1.dc1`) — per-instance input |
+| `vpc_id` + `subnet_name` | ecs, rds-postgresql, dcs, elb, gaussdb | Defaulted from the site network configuration above; subnets are resolved via `hcs_vpc_subnets` |
+| `security_group_id`/`security_group_name` | rds-postgresql (defaulted), dcs/gaussdb (optional), ecs (defaulted) | Existing security groups |
 
 ## Service-specific behavior
 

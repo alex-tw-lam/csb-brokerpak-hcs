@@ -65,6 +65,8 @@ export GSB_BROKERPAK_BUILTIN_PATH=$PWD
 export SECURITY_USER_NAME=user SECURITY_USER_PASSWORD=pass
 export DB_TYPE=sqlite3 DB_PATH=/tmp/csb-hcs.db
 # plus the HCS_* variables from configuration.md
+# (credentials, cloud/region, and the site network defaults
+#  HCS_VPC_ID / HCS_SUBNET_NAME / HCS_SECURITY_GROUP_ID / HCS_SECURITY_GROUP_NAME)
 go run github.com/cloudfoundry/cloud-service-broker/v2 serve
 ```
 

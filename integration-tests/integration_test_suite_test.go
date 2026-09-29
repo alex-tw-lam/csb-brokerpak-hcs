@@ -18,6 +18,10 @@ func TestIntegrationTests(t *testing.T) {
 const (
 	fakeRegion              = "fake-region"
 	fakeCloud               = "fake.hcs.example.com"
+	fakeVPCID               = "fake-vpc-id"
+	fakeSubnetName          = "fake-subnet-from-config"
+	fakeSGID                = "fake-sg-id"
+	fakeSGName              = "fake-sg-name"
 	documentationURL        = "https://doc.hcs.huawei.com/index.html"
 	Name                    = "Name"
 	ID                      = "ID"
@@ -78,6 +82,10 @@ var _ = BeforeSuite(func() {
 		"HCS_CLOUD=" + fakeCloud,
 		"HCS_ACCESS_KEY=fake-access-key",
 		"HCS_SECRET_KEY=fake-secret-key",
+		"HCS_VPC_ID=fake-vpc-id",
+		"HCS_SUBNET_NAME=fake-subnet-from-config",
+		"HCS_SECURITY_GROUP_ID=fake-sg-id",
+		"HCS_SECURITY_GROUP_NAME=fake-sg-name",
 		"CSB_LISTENER_HOST=localhost",
 		`GSB_BROKERPAK_CONFIG={"global_labels":[{"key":  "key1", "value":  "value1"},{"key":  "key2", "value":  "value2"}]}`,
 	})).To(Succeed())

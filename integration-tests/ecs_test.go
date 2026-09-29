@@ -22,8 +22,6 @@ var _ = Describe("ECS", Label("ecs"), func() {
 		instanceID, err := broker.Provision(ecsServiceName, "small", map[string]any{
 			"image_name":        "Ubuntu 22.04 server 64bit",
 			"availability_zone": "az1",
-			"vpc_id":            "fake-vpc-id",
-			"subnet_name":       "subnet-default",
 		})
 
 		Expect(err).NotTo(HaveOccurred())
@@ -32,12 +30,12 @@ var _ = Describe("ECS", Label("ecs"), func() {
 				HaveKeyWithValue("instance_name", "csb-ecs-"+instanceID),
 				HaveKeyWithValue("image_name", "Ubuntu 22.04 server 64bit"),
 				HaveKeyWithValue("availability_zone", "az1"),
-				HaveKeyWithValue("vpc_id", "fake-vpc-id"),
-				HaveKeyWithValue("subnet_name", "subnet-default"),
+				HaveKeyWithValue("vpc_id", fakeVPCID),
+				HaveKeyWithValue("subnet_name", fakeSubnetName),
 				HaveKeyWithValue("flavor", "s6.large.2"),
 				HaveKeyWithValue("cores", float64(2)),
 				HaveKeyWithValue("memory_gb", float64(4)),
-				HaveKeyWithValue("security_group_names", ConsistOf("default")),
+				HaveKeyWithValue("security_group_name", fakeSGName),
 				HaveKeyWithValue("admin_pass", BeNil()),
 				HaveKeyWithValue("system_disk_type", "business_type_01"),
 				HaveKeyWithValue("system_disk_size", float64(40)),
@@ -57,7 +55,6 @@ var _ = Describe("ECS", Label("ecs"), func() {
 		_, err := broker.Provision(ecsServiceName, "medium", map[string]any{
 			"image_name":        "mini_image",
 			"availability_zone": "az2.dc1",
-			"vpc_id":            "fake-vpc-id",
 			"subnet_name":       "subnet-app",
 			"system_disk_size":  100,
 			"allocate_eip":      true,
@@ -83,8 +80,6 @@ var _ = Describe("ECS", Label("ecs"), func() {
 		_, err := broker.Provision(ecsServiceName, "small", map[string]any{
 			"image_name":        "mini_image",
 			"availability_zone": "az1",
-			"vpc_id":            "fake-vpc-id",
-			"subnet_name":       "subnet-default",
 			"flavor":            "s6.2xlarge.2",
 		})
 
@@ -101,8 +96,6 @@ var _ = Describe("ECS", Label("ecs"), func() {
 			"missing required image_name",
 			map[string]any{
 				"availability_zone": "az1",
-				"vpc_id":            "fake-vpc-id",
-				"subnet_name":       "subnet-default",
 			},
 			"image_name",
 		),
@@ -111,8 +104,6 @@ var _ = Describe("ECS", Label("ecs"), func() {
 			map[string]any{
 				"image_name":        "mini_image",
 				"availability_zone": "az1",
-				"vpc_id":            "fake-vpc-id",
-				"subnet_name":       "subnet-default",
 				"system_disk_size":  0,
 			},
 			"system_disk_size",
@@ -133,8 +124,6 @@ var _ = Describe("ECS", Label("ecs"), func() {
 		instanceID, err := broker.Provision(ecsServiceName, "small", map[string]any{
 			"image_name":        "mini_image",
 			"availability_zone": "az1",
-			"vpc_id":            "fake-vpc-id",
-			"subnet_name":       "subnet-default",
 		})
 		Expect(err).NotTo(HaveOccurred())
 

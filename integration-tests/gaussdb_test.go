@@ -21,8 +21,6 @@ var _ = Describe("GaussDB", Label("gaussdb"), func() {
 		instanceID, err := broker.Provision(gaussdbServiceName, "small", map[string]any{
 			"availability_zones": []any{"az1", "az2", "az3"},
 			"volume_size":        480,
-			"vpc_id":             "fake-vpc-id",
-			"subnet_name":        "subnet-default",
 		})
 
 		Expect(err).NotTo(HaveOccurred())
@@ -38,8 +36,8 @@ var _ = Describe("GaussDB", Label("gaussdb"), func() {
 				HaveKeyWithValue("volume_type", "ULTRAHIGH"),
 				HaveKeyWithValue("volume_size", float64(480)),
 				HaveKeyWithValue("port", "8000"),
-				HaveKeyWithValue("vpc_id", "fake-vpc-id"),
-				HaveKeyWithValue("subnet_name", "subnet-default"),
+				HaveKeyWithValue("vpc_id", fakeVPCID),
+				HaveKeyWithValue("subnet_name", fakeSubnetName),
 				HaveKeyWithValue("security_group_id", BeNil()),
 				HaveKeyWithValue("sharding_num", float64(3)),
 				HaveKeyWithValue("coordinator_num", float64(3)),
@@ -68,8 +66,6 @@ var _ = Describe("GaussDB", Label("gaussdb"), func() {
 		instanceID, err := broker.Provision(gaussdbServiceName, "small", map[string]any{
 			"availability_zones": []any{"az1", "az2", "az3"},
 			"volume_size":        480,
-			"vpc_id":             "fake-vpc-id",
-			"subnet_name":        "subnet-default",
 		})
 		Expect(err).NotTo(HaveOccurred())
 
