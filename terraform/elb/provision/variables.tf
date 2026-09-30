@@ -25,8 +25,8 @@ variable "l7_flavor_id" {
   default     = null
 }
 
-variable "vpc_id" {
-  description = "ID of the VPC for the load balancer network."
+variable "vpc_name" {
+  description = "Name of the VPC for the load balancer network."
   type        = string
 }
 

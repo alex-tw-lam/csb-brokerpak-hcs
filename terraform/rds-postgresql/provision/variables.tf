@@ -48,8 +48,8 @@ variable "port" {
   type        = number
 }
 
-variable "vpc_id" {
-  description = "ID of the VPC for the instance network."
+variable "vpc_name" {
+  description = "Name of the VPC for the instance network."
   type        = string
 }
 
@@ -58,8 +58,8 @@ variable "subnet_name" {
   type        = string
 }
 
-variable "security_group_id" {
-  description = "ID of the security group controlling access."
+variable "security_group_name" {
+  description = "Name of the security group controlling access."
   type        = string
 }
 

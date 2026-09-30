@@ -27,7 +27,7 @@ var _ = Describe("ELB", Label("elb"), func() {
 				HaveKeyWithValue("loadbalancer_name", "csb-elb-"+instanceID),
 				HaveKeyWithValue("l4_flavor_id", "fake-l4-flavor"),
 				HaveKeyWithValue("l7_flavor_id", "fake-l7-flavor"),
-				HaveKeyWithValue("vpc_id", fakeVPCID),
+				HaveKeyWithValue("vpc_name", fakeVPCName),
 				HaveKeyWithValue("subnet_name", fakeELBSubnetName),
 				HaveKeyWithValue("ipv4_address", BeNil()),
 				HaveKeyWithValue("listener_protocol", "TCP"),

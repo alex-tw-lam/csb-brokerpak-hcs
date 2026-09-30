@@ -1,5 +1,20 @@
 # Configuration
 
+The primary configuration home is the **CSB config file**
+(`config/hcs-broker.yaml.example` is a ready-to-copy template):
+
+```bash
+csb serve --config hcs-broker.yaml
+```
+
+It carries everything static: the HCS connection settings (`hcs.cloud`, `hcs.region`,
+…), the site network tree (`hcs.vpc_name` and the per-service
+`subnet_name`/`security_group_name` keys) and the ELB plan definitions
+(`service.csb-hcs-elb.plans`, JSON as a string). Only credentials are expected in the
+environment. Keys listed in the manifest's `env_config_mapping` can still be set via
+`HCS_*` environment variables — those override the file — which is handy for tests and
+one-off runs.
+
 ## Broker API & storage (CSB core)
 
 | Variable | Default | Description |
@@ -15,10 +30,9 @@
 
 ## HCS connection
 
-All variables are read natively by `terraform-provider-hcs` via environment passthrough
-— credentials never enter the CSB database. The manifest additionally maps them into
-broker config keys (`env_config_mapping`), which is what the per-service
-`${config("hcs.region")}` / `${config("hcs.cloud")}` defaults read.
+Non-secret connection settings live in the config file under `hcs:` (see the template).
+Credentials are passed as environment variables and are read natively by
+`terraform-provider-hcs` — they never enter the CSB database or the config file.
 
 ### AK/SK authentication
 
@@ -47,25 +61,25 @@ broker config keys (`env_config_mapping`), which is what the per-service
 
 ### Site network defaults
 
-One shared VPC plus a dedicated subnet and security group per service. Configure these
-once per site and every service picks up its own defaults; each can still be overridden
-per service instance at provision time.
+One shared VPC plus a dedicated subnet and security group per service — **all by
+name**, configured once in the config file (`hcs:` tree). Names are resolved to IDs at
+provision time (`hcs_vpcs` for the VPC, `hcs_vpc_subnets` per subnet,
+`hcs_networking_secgroups` per security group), so no UUIDs ever appear in the
+configuration.
 
-| Variable | Config key | Used by |
+| Config key | Env override | Used by |
 |---|---|---|
-| `HCS_VPC_ID` | `hcs.vpc_id` | ecs, rds-postgresql, dcs, elb, gaussdb (shared VPC) |
-| `HCS_ECS_SUBNET_NAME` | `hcs.ecs.subnet_name` | ecs |
-| `HCS_ECS_SECURITY_GROUP_NAME` | `hcs.ecs.security_group_name` | ecs |
-| `HCS_RDS_POSTGRESQL_SUBNET_NAME` | `hcs.rds_postgresql.subnet_name` | rds-postgresql |
-| `HCS_RDS_POSTGRESQL_SECURITY_GROUP_ID` | `hcs.rds_postgresql.security_group_id` | rds-postgresql |
-| `HCS_DCS_SUBNET_NAME` | `hcs.dcs.subnet_name` | dcs |
-| `HCS_ELB_SUBNET_NAME` | `hcs.elb.subnet_name` | elb |
-| `HCS_GAUSSDB_SUBNET_NAME` | `hcs.gaussdb.subnet_name` | gaussdb |
+| `hcs.vpc_name` | `HCS_VPC_NAME` | ecs, rds-postgresql, dcs, elb, gaussdb (shared VPC) |
+| `hcs.ecs.subnet_name` | `HCS_ECS_SUBNET_NAME` | ecs |
+| `hcs.ecs.security_group_name` | `HCS_ECS_SECURITY_GROUP_NAME` | ecs |
+| `hcs.rds_postgresql.subnet_name` | `HCS_RDS_POSTGRESQL_SUBNET_NAME` | rds-postgresql |
+| `hcs.rds_postgresql.security_group_name` | `HCS_RDS_POSTGRESQL_SECURITY_GROUP_NAME` | rds-postgresql |
+| `hcs.dcs.subnet_name` | `HCS_DCS_SUBNET_NAME` | dcs |
+| `hcs.elb.subnet_name` | `HCS_ELB_SUBNET_NAME` | elb |
+| `hcs.gaussdb.subnet_name` | `HCS_GAUSSDB_SUBNET_NAME` | gaussdb |
 
 The optional security group inputs on `csb-hcs-dcs` (Redis 3.0 only) and
-`csb-hcs-gaussdb` (custom port only) remain per-instance parameters. All keys can also
-be set in the CSB config file instead of the environment via the manifest's
-`env_config_mapping`.
+`csb-hcs-gaussdb` (custom port only) remain per-instance parameters (also by name).
 
 If your site's service endpoint hostnames do not follow the
 `<service>.<region>.<cloud>` convention, set the provider `endpoints` map — this
@@ -119,8 +133,8 @@ Notes:
 | `system_disk_type` | ecs | e.g. `business_type_01` — HCS disk type catalog differs per site |
 | `eip_iptype` | ecs, elb | e.g. `5_bgp`/`5_sbgp` or site network name |
 | `availability_zone`/`availability_zones` | all | Site AZ naming (e.g. `az1.dc1`) — per-instance input |
-| `vpc_id` + `subnet_name` | ecs, rds-postgresql, dcs, elb, gaussdb | Defaulted per service from the site network configuration above; subnets are resolved via `hcs_vpc_subnets` |
-| `security_group_id`/`security_group_name` | rds-postgresql (defaulted), ecs (defaulted), dcs/gaussdb (optional, per-instance) | Existing security groups |
+| `vpc_name` + `subnet_name` | ecs, rds-postgresql, dcs, elb, gaussdb | Defaulted per service from the site network configuration above |
+| `security_group_name` | rds-postgresql (defaulted), ecs (defaulted), dcs/gaussdb (optional, per-instance) | Existing security groups |
 
 ## Tagging
 

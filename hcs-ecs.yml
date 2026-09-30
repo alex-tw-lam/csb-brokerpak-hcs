@@ -58,10 +58,10 @@ provision:
     required: true
     details: Availability zone to place the instance in (site-specific, e.g. "az1").
     prohibit_update: true
-  - field_name: vpc_id
+  - field_name: vpc_name
     type: string
-    details: ID of an existing VPC for the network. Defaults to the site configuration (HCS_VPC_ID); can be overridden per instance.
-    default: ${config("hcs.vpc_id")}
+    details: Name of an existing VPC for the network. Defaults to the site configuration (HCS_VPC_NAME); can be overridden per instance.
+    default: ${config("hcs.vpc_name")}
     prohibit_update: true
   - field_name: subnet_name
     type: string

@@ -41,8 +41,8 @@ variable "availability_zone" {
   type        = string
 }
 
-variable "vpc_id" {
-  description = "ID of the VPC for the instance network."
+variable "vpc_name" {
+  description = "Name of the VPC for the instance network."
   type        = string
 }
 

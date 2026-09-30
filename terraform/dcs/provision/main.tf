@@ -14,10 +14,10 @@ resource "hcs_dcs_instance" "instance" {
   flavor             = local.flavor
   availability_zones = local.availability_zones
 
-  vpc_id    = var.vpc_id
+  vpc_id    = data.hcs_vpcs.vpc.vpcs[0].id
   subnet_id = data.hcs_vpc_subnets.subnet.subnets[0].id
 
-  security_group_id = var.security_group_id
+  security_group_id = length(data.hcs_networking_secgroups.secgroup) > 0 ? data.hcs_networking_secgroups.secgroup[0].security_groups[0].id : null
   port              = var.port
   password          = local.generated_password
   description       = var.description

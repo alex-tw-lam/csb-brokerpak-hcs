@@ -1,7 +1,7 @@
 resource "hcs_elb_loadbalancer" "loadbalancer" {
   name = var.loadbalancer_name
 
-  vpc_id         = var.vpc_id
+  vpc_id         = data.hcs_vpcs.vpc.vpcs[0].id
   ipv4_subnet_id = local.ipv4_subnet_id
   ipv4_address   = var.ipv4_address
 

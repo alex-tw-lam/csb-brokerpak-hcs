@@ -30,7 +30,7 @@ var _ = Describe("ECS", Label("ecs"), func() {
 				HaveKeyWithValue("instance_name", "csb-ecs-"+instanceID),
 				HaveKeyWithValue("image_name", "Ubuntu 22.04 server 64bit"),
 				HaveKeyWithValue("availability_zone", "az1"),
-				HaveKeyWithValue("vpc_id", fakeVPCID),
+				HaveKeyWithValue("vpc_name", fakeVPCName),
 				HaveKeyWithValue("subnet_name", fakeECSSubnetName),
 				HaveKeyWithValue("flavor", "s6.large.2"),
 				HaveKeyWithValue("cores", float64(2)),

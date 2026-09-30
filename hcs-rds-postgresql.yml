@@ -89,20 +89,20 @@ provision:
     constraints:
       minimum: 2100
       maximum: 9500
-  - field_name: vpc_id
+  - field_name: vpc_name
     type: string
-    details: ID of an existing VPC for the network. Defaults to the site configuration (HCS_VPC_ID); can be overridden per instance.
-    default: ${config("hcs.vpc_id")}
+    details: Name of an existing VPC for the network. Defaults to the site configuration (HCS_VPC_NAME); can be overridden per instance.
+    default: ${config("hcs.vpc_name")}
     prohibit_update: true
   - field_name: subnet_name
     type: string
     details: Name of an existing subnet within `vpc_id`. Defaults to the site configuration (HCS_RDS_POSTGRESQL_SUBNET_NAME); can be overridden per instance.
     default: ${config("hcs.rds_postgresql.subnet_name")}
     prohibit_update: true
-  - field_name: security_group_id
+  - field_name: security_group_name
     type: string
-    details: ID of an existing security group controlling access to the instance. Defaults to the site configuration (HCS_RDS_POSTGRESQL_SECURITY_GROUP_ID); can be overridden per instance.
-    default: ${config("hcs.rds_postgresql.security_group_id")}
+    details: Name of an existing security group controlling access to the instance. Defaults to the site configuration (HCS_RDS_POSTGRESQL_SECURITY_GROUP_NAME); can be overridden per instance.
+    default: ${config("hcs.rds_postgresql.security_group_name")}
   - field_name: admin_password
     type: string
     nullable: true

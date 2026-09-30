@@ -11,14 +11,14 @@ resource "hcs_gaussdb_opengauss_instance" "instance" {
   flavor   = var.flavor
   password = local.generated_password
 
-  vpc_id          = var.vpc_id
+  vpc_id          = data.hcs_vpcs.vpc.vpcs[0].id
   subnet_id       = data.hcs_vpc_subnets.subnet.subnets[0].id
   port            = var.port
   solution        = var.solution
   sharding_num    = var.sharding_num
   coordinator_num = var.coordinator_num
 
-  security_group_id = var.security_group_id
+  security_group_id = length(data.hcs_networking_secgroups.secgroup) > 0 ? data.hcs_networking_secgroups.secgroup[0].security_groups[0].id : null
 
   availability_zone = local.availability_zone
 

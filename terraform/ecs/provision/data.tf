@@ -1,5 +1,9 @@
+data "hcs_vpcs" "vpc" {
+  name = var.vpc_name
+}
+
 data "hcs_vpc_subnets" "subnet" {
-  vpc_id = var.vpc_id
+  vpc_id = data.hcs_vpcs.vpc.vpcs[0].id
   name   = var.subnet_name
 }
 

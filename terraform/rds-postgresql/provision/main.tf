@@ -9,9 +9,9 @@ resource "random_password" "admin_password" {
 resource "hcs_rds_instance" "instance" {
   name              = var.instance_name
   flavor            = var.flavor
-  vpc_id            = var.vpc_id
+  vpc_id            = data.hcs_vpcs.vpc.vpcs[0].id
   subnet_id         = data.hcs_vpc_subnets.subnet.subnets[0].id
-  security_group_id = var.security_group_id
+  security_group_id = data.hcs_networking_secgroups.secgroup.security_groups[0].id
   availability_zone = var.availability_zones
 
   ha_replication_mode = local.is_ha ? var.ha_replication_mode : null

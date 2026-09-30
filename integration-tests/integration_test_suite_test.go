@@ -18,11 +18,11 @@ func TestIntegrationTests(t *testing.T) {
 const (
 	fakeRegion              = "fake-region"
 	fakeCloud               = "fake.hcs.example.com"
-	fakeVPCID               = "fake-vpc-id"
+	fakeVPCName             = "fake-vpc-name"
 	fakeECSSubnetName       = "fake-ecs-subnet"
 	fakeECSSGName           = "fake-ecs-sg"
 	fakeRdsPgSubnetName     = "fake-rds-pg-subnet"
-	fakeRdsPgSGID           = "fake-rds-pg-sg-id"
+	fakeRdsPgSGName         = "fake-rds-pg-sg"
 	fakeDCSSubnetName       = "fake-dcs-subnet"
 	fakeELBSubnetName       = "fake-elb-subnet"
 	fakeGaussdbSubnetName   = "fake-gaussdb-subnet"
@@ -86,11 +86,11 @@ var _ = BeforeSuite(func() {
 		"HCS_CLOUD=" + fakeCloud,
 		"HCS_ACCESS_KEY=fake-access-key",
 		"HCS_SECRET_KEY=fake-secret-key",
-		"HCS_VPC_ID=fake-vpc-id",
+		"HCS_VPC_NAME=fake-vpc-name",
 		"HCS_ECS_SUBNET_NAME=fake-ecs-subnet",
 		"HCS_ECS_SECURITY_GROUP_NAME=fake-ecs-sg",
 		"HCS_RDS_POSTGRESQL_SUBNET_NAME=fake-rds-pg-subnet",
-		"HCS_RDS_POSTGRESQL_SECURITY_GROUP_ID=fake-rds-pg-sg-id",
+		"HCS_RDS_POSTGRESQL_SECURITY_GROUP_NAME=fake-rds-pg-sg",
 		"HCS_DCS_SUBNET_NAME=fake-dcs-subnet",
 		"HCS_ELB_SUBNET_NAME=fake-elb-subnet",
 		"HCS_GAUSSDB_SUBNET_NAME=fake-gaussdb-subnet",

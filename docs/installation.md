@@ -64,11 +64,10 @@ Minimal local run:
 export GSB_BROKERPAK_BUILTIN_PATH=$PWD
 export SECURITY_USER_NAME=user SECURITY_USER_PASSWORD=pass
 export DB_TYPE=sqlite3 DB_PATH=/tmp/csb-hcs.db
-# plus the HCS_* variables from configuration.md
-# (credentials, cloud/region, and the site network defaults
-#  HCS_VPC_ID and the per-service HCS_*_SUBNET_NAME /
-#  HCS_*_SECURITY_GROUP_* variables)
-go run github.com/cloudfoundry/cloud-service-broker/v2 serve
+export HCS_ACCESS_KEY=... HCS_SECRET_KEY=...     # credentials via environment
+cp config/hcs-broker.yaml.example hcs-broker.yaml  # ...everything else in the file
+$EDITOR hcs-broker.yaml
+go run github.com/cloudfoundry/cloud-service-broker/v2 serve --config hcs-broker.yaml
 ```
 
 For a container image, start from the CSB release binary (see

@@ -45,8 +45,8 @@ variable "standby_availability_zone" {
   default     = null
 }
 
-variable "vpc_id" {
-  description = "ID of the VPC for the instance network."
+variable "vpc_name" {
+  description = "Name of the VPC for the instance network."
   type        = string
 }
 
@@ -55,8 +55,8 @@ variable "subnet_name" {
   type        = string
 }
 
-variable "security_group_id" {
-  description = "ID of the security group (required for Redis 3.0)."
+variable "security_group_name" {
+  description = "Name of the security group (required for Redis 3.0)."
   type        = string
   default     = null
 }
