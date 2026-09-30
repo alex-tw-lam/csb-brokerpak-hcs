@@ -1,6 +1,3 @@
-locals {
-  generated_secret = var.secret_text == null || var.secret_text == "" ? random_password.secret[0].result : var.secret_text
-}
 
 locals {
   request_context = var.request_context_json != "" ? try(jsondecode(var.request_context_json), {}) : {}

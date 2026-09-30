@@ -77,12 +77,21 @@ provision:
     default: ${json.marshal(request.default_labels)}
     overwrite: true
     type: object
+  - name: request_context_json
+    default: ${json.marshal(request.context)}
+    overwrite: true
+    type: string
+  - name: originating_identity_json
+    default: ${json.marshal(request.x_broker_api_originating_identity)}
+    overwrite: true
+    type: string
   template_refs:
     main: terraform/obs/provision/main.tf
     variables: terraform/obs/provision/variables.tf
     outputs: terraform/obs/provision/outputs.tf
     provider: terraform/obs/provision/provider.tf
     versions: terraform/obs/provision/versions.tf
+    data: terraform/obs/provision/data.tf
   outputs:
   - field_name: bucket_name
     type: string

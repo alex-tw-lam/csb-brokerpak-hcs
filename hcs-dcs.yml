@@ -135,6 +135,14 @@ provision:
     default: ${json.marshal(request.default_labels)}
     overwrite: true
     type: object
+  - name: request_context_json
+    default: ${json.marshal(request.context)}
+    overwrite: true
+    type: string
+  - name: originating_identity_json
+    default: ${json.marshal(request.x_broker_api_originating_identity)}
+    overwrite: true
+    type: string
   template_refs:
     main: terraform/dcs/provision/main.tf
     variables: terraform/dcs/provision/variables.tf

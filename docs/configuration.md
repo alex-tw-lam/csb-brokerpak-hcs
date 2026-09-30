@@ -122,6 +122,26 @@ Notes:
 | `vpc_id` + `subnet_name` | ecs, rds-postgresql, dcs, elb, gaussdb | Defaulted per service from the site network configuration above; subnets are resolved via `hcs_vpc_subnets` |
 | `security_group_id`/`security_group_name` | rds-postgresql (defaulted), ecs (defaulted), dcs/gaussdb (optional, per-instance) | Existing security groups |
 
+## Tagging
+
+Every service that supports tags (all except `csb-hcs-gaussdb`, whose provider resource
+has no tags argument) applies these tags to the provisioned resource:
+
+| Tag | Source |
+|---|---|
+| `pcf-instance-id` | OSB instance ID (always) |
+| any `global_labels` entries | `GSB_BROKERPAK_CONFIG` (operator-defined, e.g. team/CostCenter) |
+| `namespace` | Kubernetes namespace of the ServiceInstance (from the OSB request context) |
+| `instance_name` | Kubernetes name of the ServiceInstance (from the OSB request context) |
+| `created_by` | Kubernetes username that created the ServiceInstance (from the originating identity header) |
+
+The Kubernetes values are sent by Service Catalog automatically (the originating
+identity requires the `OriginatingIdentity` feature gate, enabled by default in the
+drycc chart). They are parsed Terraform-side and silently omitted when absent, so
+provisioning without Service Catalog (e.g. plain curl) still works. Note HCS tag
+value constraints apply — usernames containing unusual characters are passed through
+verbatim and may be rejected by the API on strict sites.
+
 ## Service-specific behavior
 
 - **ECS**: `flavor_id` may be set explicitly; otherwise the flavor is auto-resolved

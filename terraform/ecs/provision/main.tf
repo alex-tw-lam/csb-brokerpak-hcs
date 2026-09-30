@@ -36,7 +36,7 @@ resource "hcs_ecs_compute_instance" "instance" {
   delete_disks_on_termination = true
   delete_eip_on_termination   = true
   user_data                   = var.user_data
-  tags                        = var.labels
+  tags                        = local.tags
 
   lifecycle {
     prevent_destroy = true

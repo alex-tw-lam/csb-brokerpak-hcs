@@ -83,3 +83,15 @@ variable "labels" {
   description = "Labels to apply as tags."
   type        = map(any)
 }
+
+variable "request_context_json" {
+  description = "JSON of the OSB request context (kubernetes namespace, instance_name, cluster id)."
+  type        = string
+  default     = ""
+}
+
+variable "originating_identity_json" {
+  description = "JSON of the OSB originating identity (kubernetes username, groups, uid)."
+  type        = string
+  default     = ""
+}

@@ -33,7 +33,7 @@ resource "hcs_rds_instance" "instance" {
     keep_days  = var.backup_keep_days
   }
 
-  tags = var.labels
+  tags = local.tags
 
   lifecycle {
     prevent_destroy = true

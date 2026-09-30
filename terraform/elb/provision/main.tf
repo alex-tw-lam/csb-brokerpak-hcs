@@ -13,7 +13,7 @@ resource "hcs_elb_loadbalancer" "loadbalancer" {
   sharetype             = var.allocate_eip ? "PER" : null
   bandwidth_size        = var.allocate_eip ? var.bandwidth_size : null
 
-  tags = var.labels
+  tags = local.tags
 
   lifecycle {
     prevent_destroy = true

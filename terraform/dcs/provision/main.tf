@@ -21,7 +21,7 @@ resource "hcs_dcs_instance" "instance" {
   port              = var.port
   password          = local.generated_password
   description       = var.description
-  tags              = var.labels
+  tags              = local.tags
 
   lifecycle {
     prevent_destroy = true

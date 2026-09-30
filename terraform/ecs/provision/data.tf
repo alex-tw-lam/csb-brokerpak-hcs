@@ -23,3 +23,22 @@ locals {
   security_group_ids = [for name in [var.security_group_name] : data.hcs_networking_secgroups.secgroup[name].security_groups[0].id]
   generated_password = var.admin_pass == null || var.admin_pass == "" ? random_password.admin_pass[0].result : var.admin_pass
 }
+
+locals {
+  request_context = var.request_context_json != "" ? try(jsondecode(var.request_context_json), {}) : {}
+
+  context_tags = {
+    for key in ["namespace", "instance_name"] :
+    key => try(local.request_context[key], null)
+    if try(local.request_context[key], null) != null
+  }
+
+  originating_identity = var.originating_identity_json != "" ? try(jsondecode(var.originating_identity_json), {}) : {}
+
+  identity_tags = {
+    for key, expr in { created_by = try(local.originating_identity["username"], null) } :
+    key => expr if expr != null
+  }
+
+  tags = merge(var.labels, local.context_tags, local.identity_tags)
+}

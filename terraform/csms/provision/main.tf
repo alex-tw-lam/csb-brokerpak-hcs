@@ -11,7 +11,7 @@ resource "hcs_csms_secret" "secret" {
   secret_text = local.generated_secret
   kms_key_id  = var.kms_key_id
   description = var.description
-  tags        = var.labels
+  tags        = local.tags
 
   lifecycle {
     prevent_destroy = true

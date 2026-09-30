@@ -9,7 +9,7 @@ resource "hcs_obs_bucket" "bucket" {
 
   force_destroy = var.force_destroy
   region        = var.region
-  tags          = var.labels
+  tags          = local.tags
 
   lifecycle {
     prevent_destroy = true
