@@ -40,6 +40,24 @@ copies local files verbatim, so the binaries must be **unpacked** — which is w
 PAK_OS=linux PAK_ARCH=arm64 scripts/fetch-binaries.sh
 ```
 
+## Local manifest changes
+
+Local experiments often need temporary `manifest.yml` edits (tofu/provider versions,
+platform targets, `url_template`s) that should never be committed. The repo supports
+this with git's skip-worktree flag:
+
+```bash
+make manifest-local-on      # hide local manifest.yml changes from git
+# ...edit manifest.yml freely; git status stays clean...
+make manifest-local-status  # check the current mode
+make manifest-local-off     # track normally again (needed to commit real changes)
+```
+
+Caveats: while ON, a `git pull` that changes `manifest.yml` upstream will refuse to
+overwrite your local copy — run `make manifest-local-off`, reconcile (stash/merge),
+then `make manifest-local-on` again. To commit a genuine manifest change, switch OFF
+first.
+
 ## Air-gapped workflow
 
 1. On a connected machine: `make fetch-binaries` (or download the three releases
