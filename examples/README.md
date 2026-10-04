@@ -1,9 +1,23 @@
 # Running the modules directly with OpenTofu
 
 Every module can be exercised with plain OpenTofu — no broker, no Service Catalog.
-Each module has a ready-to-edit input file under `examples/<service>/`, all in the
-same format: **connection → network → sizing → instance → tags**. The bind files
-take the values printed by the corresponding provision run (`tofu output`).
+Each module has an input file under `examples/<service>/`, all in the same format:
+**connection → network → sizing → instance → tags**. The bind files take the values
+printed by the corresponding provision run (`tofu output`).
+
+The layout is layered: **`examples/shared.tfvars`** carries the common values
+(connection, shared VPC) and each module's file adds only its own values. OpenTofu
+accepts multiple `-var-file` flags — later files win — so the run command is:
+
+```bash
+tofu apply -var-file=../../examples/shared.tfvars -var-file=../../examples/<service>/<provision|bind>.tfvars
+```
+
+The shared file and the provision tfvars are **generated** — edit
+`config/site-values.yaml` and run `make gen-config` (which also produces
+`hcs-broker.yaml`, so one set of site values serves both direct-tofu runs and the
+broker). The bind files are static: they hold per-binding choices and output
+placeholders.
 
 ## Auth (every module, provider-native)
 
@@ -41,8 +55,8 @@ Run pattern, identical for every row:
 ```bash
 cd terraform/<service>/<provision|bind>
 tofu init
-tofu plan  -var-file=../../examples/<service>/<provision|bind>.tfvars
-tofu apply -var-file=../../examples/<service>/<provision|bind>.tfvars
+tofu plan  -var-file=../../examples/shared.tfvars -var-file=../../examples/<service>/<provision|bind>.tfvars
+tofu apply -var-file=../../examples/shared.tfvars -var-file=../../examples/<service>/<provision|bind>.tfvars
 tofu output                                     # copy these into the bind tfvars
 ```
 
@@ -56,7 +70,7 @@ block temporarily.
 The tfvars values are deliberately identical to what you configure elsewhere, so
 one set of site values works everywhere:
 
-| tfvars key | Broker config file (`config/hcs-broker.yaml.example`) | Service Catalog |
+| tfvars key | `config/site-values.yaml` → generated `hcs-broker.yaml` | Service Catalog |
 |---|---|---|
 | `region`, `cloud`, `insecure` | `hcs.region`, `hcs.cloud`, `hcs.insecure` | — |
 | `vpc_name`, `subnet_name`, `security_group_name` | `hcs.vpc_name`, `hcs.<service>.subnet_name`, `...security_group_name` | — (or per-instance override) |

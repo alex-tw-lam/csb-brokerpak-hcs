@@ -1,0 +1,98 @@
+# =============================================================================
+# Site values — the single source of truth for the HCS brokerpak.
+#
+# Edit ONLY this file, then regenerate everything:
+#
+#     make gen-config
+#
+# which writes:
+#   hcs-broker.yaml                  — broker config (csb serve --config ...)
+#   examples/<service>/provision.tfvars — inputs for direct OpenTofu runs
+#
+# The bind tfvars (examples/<service>/bind.tfvars) contain per-binding choices
+# and placeholders for the provision outputs, so they are not generated.
+# =============================================================================
+
+connection:
+  region: cn-north-1
+  cloud: hcs.example.com            # REQUIRED — service endpoints are derived from it
+  insecure: true                    # typical for self-signed certificates
+  # auth_url: https://iam-apigateway-proxy.hcs.example.com/v3
+
+network:
+  vpc_name: vpc-default             # one shared VPC, everything by name
+  ecs:
+    subnet_name: subnet-ecs
+    security_group_name: sg-ecs
+  rds_postgresql:
+    subnet_name: subnet-rds-pg
+    security_group_name: sg-rds-pg
+  dcs:
+    subnet_name: subnet-dcs
+  elb:
+    subnet_name: subnet-elb
+  gaussdb:
+    subnet_name: subnet-gaussdb
+
+# ELB plan sizing (flavors are created per site); feeds service.csb-hcs-elb.plans.
+elb_plan:
+  name: default
+  id: 1d1c9366-6f51-4f51-8eb0-6a1a29f36c1e
+  description: Default ELB plan
+  l4_flavor_id: CHANGE_ME_L4
+  l7_flavor_id: CHANGE_ME_L7
+
+# -----------------------------------------------------------------------------
+# Per-instance inputs for direct OpenTofu runs (NOT broker configuration —
+# these stay per ServiceInstance parameters when going through the broker).
+# -----------------------------------------------------------------------------
+instances:
+  ecs:
+    flavor: s6.large.2              # omit to auto-resolve from cores/memory
+    image_name: Ubuntu 22.04 server 64bit
+    availability_zone: az1
+    system_disk_type: business_type_01
+    system_disk_size: 40
+    allocate_eip: false
+    eip_iptype: 5_bgp
+    bandwidth_size: 5
+
+  rds-postgresql:
+    flavor: rds.pg.n1.large.2       # single node; use *.ha flavors with two AZs
+    pg_version: "12"
+    storage_gb: 100
+    volume_type: ULTRAHIGH
+    availability_zones: [az1]
+    port: 5432
+
+  dcs:
+    capacity: 0.125
+    cache_mode: single
+    engine_version: "5.0"
+    availability_zone: az1
+    port: 6379
+
+  elb:
+    listener_protocol: TCP
+    listener_port: 80
+    lb_method: ROUND_ROBIN
+    allocate_eip: false
+    eip_iptype: 5_bgp
+    bandwidth_size: 5
+
+  gaussdb:
+    flavor: gaussdb.opengauss.ee.dn.m6.2xlarge.8.in
+    volume_type: ULTRAHIGH
+    volume_size: 480
+    solution: hcs1
+    availability_zones: [az1, az2, az3]
+    port: "8000"
+
+  csms:
+    secret_name: csb-test-secret
+
+  obs:
+    bucket_name: csb-test-bucket-CHANGE_ME   # globally unique, DNS-compatible
+    acl: private
+    storage_class: STANDARD
+    force_destroy: true                      # convenient for trials

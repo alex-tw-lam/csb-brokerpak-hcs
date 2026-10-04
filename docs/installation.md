@@ -65,8 +65,8 @@ export GSB_BROKERPAK_BUILTIN_PATH=$PWD
 export SECURITY_USER_NAME=user SECURITY_USER_PASSWORD=pass
 export DB_TYPE=sqlite3 DB_PATH=/tmp/csb-hcs.db
 export HCS_ACCESS_KEY=... HCS_SECRET_KEY=...     # credentials via environment
-cp config/hcs-broker.yaml.example hcs-broker.yaml  # ...everything else in the file
-$EDITOR hcs-broker.yaml
+$EDITOR config/site-values.yaml   # ...everything else in one file
+make gen-config                   # -> hcs-broker.yaml + examples/*/provision.tfvars
 go run github.com/cloudfoundry/cloud-service-broker/v2 serve --config hcs-broker.yaml
 ```
 

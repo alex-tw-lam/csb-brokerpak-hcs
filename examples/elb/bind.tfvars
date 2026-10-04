@@ -2,16 +2,12 @@
 # csb-hcs-elb — bind (registers a backend member)
 # Run:  cd terraform/elb/bind
 #       tofu init
-#       tofu plan  -var-file=../../examples/elb/bind.tfvars
-#       tofu apply -var-file=../../examples/elb/bind.tfvars
+#       tofu plan  -var-file=../../examples/shared.tfvars -var-file=../../examples/elb/bind.tfvars
+#       tofu apply -var-file=../../examples/shared.tfvars -var-file=../../examples/elb/bind.tfvars
 # Auth: export HCS_ACCESS_KEY=... HCS_SECRET_KEY=...   (or IAM user/password)
 #       export HCS_INSECURE=true                        (self-signed certs)
 # Values mirror config/hcs-broker.yaml.example + ServiceInstance parameters.
 # -----------------------------------------------------------------------------
-# --- connection (same two lines for every module) ---
-region = "cn-north-1"
-cloud  = "hcs.example.com"
-
 # --- backend to register ---
 address = "192.168.1.10"
 port    = 8080

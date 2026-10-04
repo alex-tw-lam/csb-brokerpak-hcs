@@ -33,6 +33,10 @@ help: ## Show this help
 fetch-binaries: ## Stage tofu and provider zips into ./bin (requires internet)
 	scripts/fetch-binaries.sh
 
+.PHONY: gen-config
+gen-config: ## Generate hcs-broker.yaml and example tfvars from config/site-values.yaml
+	python3 scripts/gen-config.py
+
 $(PAK): manifest.yml $(wildcard hcs-*.yml) $(TF_FILES) $(BIN_STAGED)
 	$(BROKER_GO_OPTS) $(RUN_CSB) pak build
 

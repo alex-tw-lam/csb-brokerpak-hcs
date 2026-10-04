@@ -1,9 +1,12 @@
 # Configuration
 
-The primary configuration home is the **CSB config file**
-(`config/hcs-broker.yaml.example` is a ready-to-copy template):
+The single source of truth for site values is **`config/site-values.yaml`** — edit
+that one file, then `make gen-config` generates both artifacts:
 
 ```bash
+make gen-config
+# -> hcs-broker.yaml                      (csb serve --config hcs-broker.yaml)
+# -> examples/<service>/provision.tfvars  (direct OpenTofu runs, see examples/README.md)
 csb serve --config hcs-broker.yaml
 ```
 
@@ -30,7 +33,8 @@ one-off runs.
 
 ## HCS connection
 
-Non-secret connection settings live in the config file under `hcs:` (see the template).
+Non-secret connection settings live in `config/site-values.yaml` and land in the
+generated `hcs-broker.yaml` under `hcs:`.
 Credentials are passed as environment variables and are read natively by
 `terraform-provider-hcs` — they never enter the CSB database or the config file.
 
