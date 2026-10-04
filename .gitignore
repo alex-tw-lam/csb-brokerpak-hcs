@@ -1,6 +1,9 @@
 # Reference repositories (cloned for study, not part of the brokerpak)
 .reference/
 
+# Local secrets (.envrc is the tracked template; .env must never be committed)
+.env
+
 # Staged release binaries (populated by scripts/fetch-binaries.sh)
 bin/
 
