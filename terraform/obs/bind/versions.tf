@@ -3,7 +3,7 @@ terraform {
 
   required_providers {
     hcs = {
-      source  = "huaweicloud/hcs"
+      source  = "registry.terraform.io/huaweicloud/hcs"
       version = "2.4.28"
     }
   }
