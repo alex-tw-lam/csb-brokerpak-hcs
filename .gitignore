@@ -27,3 +27,4 @@ coverage.out
 .pak-cache/
 .zcode/
 manifest.yml
+diff/
