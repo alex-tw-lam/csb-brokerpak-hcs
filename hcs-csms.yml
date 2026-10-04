@@ -53,6 +53,11 @@ provision:
     details: HCS cloud domain used to derive service endpoints (e.g. "hcs.example.com").
     default: ${config("hcs.cloud")}
     prohibit_update: true
+  - field_name: project_name
+    type: string
+    details: The HCS project (tenant) name.
+    default: ${config("hcs.project_name")}
+    prohibit_update: true
   computed_inputs:
   - name: labels
     default: ${json.marshal(request.default_labels)}
@@ -92,6 +97,9 @@ provision:
   - field_name: cloud
     type: string
     details: HCS cloud domain
+  - field_name: project_name
+    type: string
+    details: HCS project name
 bind:
   plan_inputs: []
   user_inputs: []
@@ -106,6 +114,10 @@ bind:
     type: string
   - name: cloud
     default: ${instance.details["cloud"]}
+    overwrite: true
+    type: string
+  - name: project_name
+    default: ${instance.details["project_name"]}
     overwrite: true
     type: string
   template_refs:

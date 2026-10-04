@@ -32,6 +32,7 @@ var _ = Describe("OBS", Label("obs"), func() {
 				HaveKeyWithValue("kms_key_id", BeNil()),
 				HaveKeyWithValue("force_destroy", false),
 				HaveKeyWithValue("region", fakeRegion),
+				HaveKeyWithValue("project_name", fakeProjectName),
 				HaveKeyWithValue("cloud", fakeCloud),
 				HaveKeyWithValue("labels", MatchKeys(IgnoreExtras, Keys{
 					"pcf-instance-id": Equal(instanceID),
@@ -98,6 +99,7 @@ var _ = Describe("OBS", Label("obs"), func() {
 			{Name: "bucket_name", Type: "string", Value: "fake-bucket"},
 			{Name: "bucket_domain_name", Type: "string", Value: "fake-bucket.obs.fake.hcs.example.com"},
 			{Name: "region", Type: "string", Value: fakeRegion},
+			{Name: "project_name", Type: "string", Value: fakeProjectName},
 			{Name: "cloud", Type: "string", Value: fakeCloud},
 		})).To(Succeed())
 
@@ -109,6 +111,7 @@ var _ = Describe("OBS", Label("obs"), func() {
 			{Name: "bucket_name", Type: "string", Value: "fake-bucket"},
 			{Name: "bucket_domain_name", Type: "string", Value: "fake-bucket.obs.fake.hcs.example.com"},
 			{Name: "region", Type: "string", Value: fakeRegion},
+			{Name: "project_name", Type: "string", Value: fakeProjectName},
 			{Name: "granted", Type: "bool", Value: false},
 		})).To(Succeed())
 
@@ -119,6 +122,7 @@ var _ = Describe("OBS", Label("obs"), func() {
 				HaveKeyWithValue("bucket_name", "fake-bucket"),
 				HaveKeyWithValue("bucket_domain_name", "fake-bucket.obs.fake.hcs.example.com"),
 				HaveKeyWithValue("region", fakeRegion),
+				HaveKeyWithValue("project_name", fakeProjectName),
 				HaveKeyWithValue("granted", false),
 			),
 		)
@@ -139,6 +143,7 @@ var _ = Describe("OBS", Label("obs"), func() {
 			{Name: "bucket_name", Type: "string", Value: "fake-bucket"},
 			{Name: "bucket_domain_name", Type: "string", Value: "fake-bucket.obs.fake.hcs.example.com"},
 			{Name: "region", Type: "string", Value: fakeRegion},
+			{Name: "project_name", Type: "string", Value: fakeProjectName},
 			{Name: "cloud", Type: "string", Value: fakeCloud},
 		})).To(Succeed())
 
@@ -149,6 +154,7 @@ var _ = Describe("OBS", Label("obs"), func() {
 			{Name: "bucket_name", Type: "string", Value: "fake-bucket"},
 			{Name: "bucket_domain_name", Type: "string", Value: "fake-bucket.obs.fake.hcs.example.com"},
 			{Name: "region", Type: "string", Value: fakeRegion},
+			{Name: "project_name", Type: "string", Value: fakeProjectName},
 			{Name: "granted", Type: "bool", Value: true},
 		})).To(Succeed())
 

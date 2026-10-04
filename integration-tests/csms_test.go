@@ -29,6 +29,7 @@ var _ = Describe("CSMS", Label("csms"), func() {
 				HaveKeyWithValue("kms_key_id", BeNil()),
 				HaveKeyWithValue("description", BeNil()),
 				HaveKeyWithValue("region", fakeRegion),
+				HaveKeyWithValue("project_name", fakeProjectName),
 				HaveKeyWithValue("cloud", fakeCloud),
 				HaveKeyWithValue("labels", MatchKeys(IgnoreExtras, Keys{
 					"pcf-instance-id": Equal(instanceID),
@@ -59,6 +60,7 @@ var _ = Describe("CSMS", Label("csms"), func() {
 			{Name: "latest_version", Type: "string", Value: "v2"},
 			{Name: "secret_text", Type: "string", Value: "fake-secret-value"},
 			{Name: "region", Type: "string", Value: fakeRegion},
+			{Name: "project_name", Type: "string", Value: fakeProjectName},
 			{Name: "cloud", Type: "string", Value: fakeCloud},
 		})).To(Succeed())
 

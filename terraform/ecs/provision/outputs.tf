@@ -33,3 +33,8 @@ output "cloud" {
   description = "HCS cloud domain."
   value       = var.cloud
 }
+
+output "project_name" {
+  description = "HCS project name."
+  value       = var.project_name
+}

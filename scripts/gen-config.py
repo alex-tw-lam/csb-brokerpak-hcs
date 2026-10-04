@@ -218,6 +218,7 @@ def gen_broker_config(v):
         "hcs:",
         f"  cloud: {conn['cloud']}",
         f"  region: {conn['region']}",
+        f"  project_name: {conn['project_name']}",
     ]
     if conn.get("auth_url"):
         lines.append(f"  auth_url: {conn['auth_url']}")
@@ -249,6 +250,16 @@ def main():
     if missing:
         sys.exit(f"site-values.yaml is missing instances for: {', '.join(missing)}")
 
+    for key in ["cloud", "region", "project_name"]:
+        if not v.get("connection", {}).get(key):
+            sys.exit(
+                f"site-values.yaml is missing connection.{key}.\n"
+                "Your local copy predates a new required key - compare with\n"
+                "config/site-values.yaml.example (diff config/site-values.yaml "
+                "config/site-values.yaml.example), copy the new key in,\n"
+                "or start fresh with `make site-values-reset`."
+            )
+
     config = gen_broker_config(v)
     BROKER_CONFIG.write_text(config)
     print(f"wrote {BROKER_CONFIG.relative_to(ROOT)}")
@@ -264,6 +275,7 @@ def main():
         "# --- connection ---",
         kv("region", v["connection"]["region"]),
         kv("cloud", v["connection"]["cloud"]),
+        kv("project_name", v["connection"]["project_name"]),
         "",
         "# --- shared network ---",
         kv("vpc_name", v["network"]["vpc_name"]),

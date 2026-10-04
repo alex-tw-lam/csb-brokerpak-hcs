@@ -42,6 +42,7 @@ var _ = Describe("RDS for PostgreSQL", Label("rds-postgresql"), func() {
 				HaveKeyWithValue("backup_start_time", "03:00-04:00"),
 				HaveKeyWithValue("backup_keep_days", float64(7)),
 				HaveKeyWithValue("region", fakeRegion),
+				HaveKeyWithValue("project_name", fakeProjectName),
 				HaveKeyWithValue("cloud", fakeCloud),
 				HaveKeyWithValue("labels", MatchKeys(IgnoreExtras, Keys{
 					"pcf-instance-id": Equal(instanceID),
@@ -106,6 +107,7 @@ var _ = Describe("RDS for PostgreSQL", Label("rds-postgresql"), func() {
 			{Name: "username", Type: "string", Value: "root"},
 			{Name: "password", Type: "string", Value: "fake-admin-password"},
 			{Name: "region", Type: "string", Value: fakeRegion},
+			{Name: "project_name", Type: "string", Value: fakeProjectName},
 			{Name: "cloud", Type: "string", Value: fakeCloud},
 		})).To(Succeed())
 
@@ -151,6 +153,7 @@ var _ = Describe("RDS for PostgreSQL", Label("rds-postgresql"), func() {
 				HaveKeyWithValue("admin_username", "root"),
 				HaveKeyWithValue("admin_password", "fake-admin-password"),
 				HaveKeyWithValue("region", fakeRegion),
+				HaveKeyWithValue("project_name", fakeProjectName),
 				HaveKeyWithValue("cloud", fakeCloud),
 			),
 		)

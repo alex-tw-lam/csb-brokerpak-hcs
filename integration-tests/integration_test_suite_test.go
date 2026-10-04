@@ -17,6 +17,7 @@ func TestIntegrationTests(t *testing.T) {
 
 const (
 	fakeRegion              = "fake-region"
+	fakeProjectName         = "fake-project"
 	fakeCloud               = "fake.hcs.example.com"
 	fakeVPCName             = "fake-vpc-name"
 	fakeECSSubnetName       = "fake-ecs-subnet"
@@ -83,6 +84,7 @@ var _ = BeforeSuite(func() {
 	Expect(broker.Start(GinkgoWriter, []string{
 		"GSB_SERVICE_CSB_HCS_ELB_PLANS=" + marshall(customELBPlans),
 		"HCS_REGION_NAME=" + fakeRegion,
+		"HCS_PROJECT_NAME=" + fakeProjectName,
 		"HCS_CLOUD=" + fakeCloud,
 		"HCS_ACCESS_KEY=fake-access-key",
 		"HCS_SECRET_KEY=fake-secret-key",

@@ -15,6 +15,7 @@
 
 connection:
   region: cn-north-1
+  project_name: cn-north-1           # HCS project (tenant); commonly the same as region
   cloud: hcs.example.com            # REQUIRED — service endpoints are derived from it
   insecure: true                    # typical for self-signed certificates
   # auth_url: https://iam-apigateway-proxy.hcs.example.com/v3

@@ -34,7 +34,9 @@ one-off runs.
 ## HCS connection
 
 Non-secret connection settings live in `config/site-values.yaml` and land in the
-generated `hcs-broker.yaml` under `hcs:`.
+generated `hcs-broker.yaml` under `hcs:`: `cloud`, `region`, `project_name`
+(HCS project/tenant, commonly equal to the region name) and optionally `auth_url` /
+`insecure`.
 Credentials are passed as environment variables and are read natively by
 `terraform-provider-hcs` — they never enter the CSB database or the config file.
 

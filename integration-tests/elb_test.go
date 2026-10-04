@@ -36,6 +36,7 @@ var _ = Describe("ELB", Label("elb"), func() {
 				HaveKeyWithValue("backend_members", BeEmpty()),
 				HaveKeyWithValue("allocate_eip", false),
 				HaveKeyWithValue("region", fakeRegion),
+				HaveKeyWithValue("project_name", fakeProjectName),
 				HaveKeyWithValue("cloud", fakeCloud),
 				HaveKeyWithValue("labels", MatchKeys(IgnoreExtras, Keys{
 					"pcf-instance-id": Equal(instanceID),
@@ -90,6 +91,7 @@ var _ = Describe("ELB", Label("elb"), func() {
 			{Name: "pool_id", Type: "string", Value: "fake-pool-id"},
 			{Name: "ipv4_subnet_id", Type: "string", Value: "fake-neutron-subnet-id"},
 			{Name: "region", Type: "string", Value: fakeRegion},
+			{Name: "project_name", Type: "string", Value: fakeProjectName},
 			{Name: "cloud", Type: "string", Value: fakeCloud},
 		})).To(Succeed())
 
@@ -151,6 +153,7 @@ var _ = Describe("ELB", Label("elb"), func() {
 			{Name: "pool_id", Type: "string", Value: "fake-pool-id"},
 			{Name: "ipv4_subnet_id", Type: "string", Value: "fake-neutron-subnet-id"},
 			{Name: "region", Type: "string", Value: fakeRegion},
+			{Name: "project_name", Type: "string", Value: fakeProjectName},
 			{Name: "cloud", Type: "string", Value: fakeCloud},
 		})).To(Succeed())
 

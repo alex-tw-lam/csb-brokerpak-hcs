@@ -29,6 +29,7 @@ terraform_binaries:
 env_config_mapping:
   HCS_CLOUD: hcs.cloud
   HCS_REGION_NAME: hcs.region
+  HCS_PROJECT_NAME: hcs.project_name
   HCS_VPC_NAME: hcs.vpc_name
   HCS_ECS_SUBNET_NAME: hcs.ecs.subnet_name
   HCS_ECS_SECURITY_GROUP_NAME: hcs.ecs.security_group_name

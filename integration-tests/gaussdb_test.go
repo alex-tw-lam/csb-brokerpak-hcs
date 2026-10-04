@@ -45,6 +45,7 @@ var _ = Describe("GaussDB", Label("gaussdb"), func() {
 				HaveKeyWithValue("backup_start_time", "03:00-04:00"),
 				HaveKeyWithValue("backup_keep_days", float64(7)),
 				HaveKeyWithValue("region", fakeRegion),
+				HaveKeyWithValue("project_name", fakeProjectName),
 				HaveKeyWithValue("cloud", fakeCloud),
 			),
 		)
@@ -60,6 +61,7 @@ var _ = Describe("GaussDB", Label("gaussdb"), func() {
 			{Name: "password", Type: "string", Value: "fake-gaussdb-password"},
 			{Name: "port", Type: "string", Value: "8000"},
 			{Name: "region", Type: "string", Value: fakeRegion},
+			{Name: "project_name", Type: "string", Value: fakeProjectName},
 			{Name: "cloud", Type: "string", Value: fakeCloud},
 		})).To(Succeed())
 

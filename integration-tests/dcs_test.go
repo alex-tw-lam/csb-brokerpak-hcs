@@ -38,6 +38,7 @@ var _ = Describe("DCS", Label("dcs"), func() {
 				HaveKeyWithValue("port", float64(6379)),
 				HaveKeyWithValue("password", BeNil()),
 				HaveKeyWithValue("region", fakeRegion),
+				HaveKeyWithValue("project_name", fakeProjectName),
 				HaveKeyWithValue("cloud", fakeCloud),
 			),
 		)
@@ -60,6 +61,7 @@ var _ = Describe("DCS", Label("dcs"), func() {
 			{Name: "port", Type: "number", Value: float64(6379)},
 			{Name: "password", Type: "string", Value: "fake-redis-password"},
 			{Name: "region", Type: "string", Value: fakeRegion},
+			{Name: "project_name", Type: "string", Value: fakeProjectName},
 			{Name: "cloud", Type: "string", Value: fakeCloud},
 		})).To(Succeed())
 
@@ -101,6 +103,7 @@ var _ = Describe("DCS", Label("dcs"), func() {
 				HaveKeyWithValue("domain_name", "fake-dcs-domain"),
 				HaveKeyWithValue("port", float64(6379)),
 				HaveKeyWithValue("region", fakeRegion),
+				HaveKeyWithValue("project_name", fakeProjectName),
 				HaveKeyWithValue("cloud", fakeCloud),
 			),
 		)

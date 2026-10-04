@@ -7,6 +7,10 @@ variable "cloud" {
   description = "The HCS cloud domain used to derive service endpoints."
   type        = string
 }
+variable "project_name" {
+  description = "The HCS project (tenant) name."
+  type        = string
+}
 
 variable "loadbalancer_id" {
   description = "ID of the provisioned load balancer."
