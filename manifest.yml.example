@@ -9,13 +9,13 @@ platforms:
   arch: amd64
 terraform_binaries:
 - name: tofu
-  version: 1.11.8
-  source: https://github.com/opentofu/opentofu/archive/v1.11.8.zip
+  version: 1.11.3
+  source: https://github.com/opentofu/opentofu/archive/v1.11.3.zip
   url_template: ./bin/${name}_${version}_${os}_${arch}/${name}
   default: true
 - name: terraform-provider-hcs
-  version: 2.4.28
-  source: https://github.com/huaweicloud/terraform-provider-hcs/archive/v2.4.28.zip
+  version: 2.4.26
+  source: https://github.com/huaweicloud/terraform-provider-hcs/archive/v2.4.26.zip
   provider: huaweicloud/hcs
   url_template: ./bin/${name}_${version}_${os}_${arch}/${name}_v${version}
 - name: terraform-provider-random

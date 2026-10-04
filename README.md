@@ -3,7 +3,7 @@
 A [Cloud Service Broker](https://github.com/cloudfoundry/cloud-service-broker) (CSB)
 **brokerpak** that provisions services on **Huawei Cloud Stack (HCS) 8.5.x** — Huawei's
 air-gapped private cloud — through the [`huaweicloud/hcs` Terraform
-provider](https://github.com/huaweicloud/terraform-provider-hcs) (v2.4.28, which targets
+provider](https://github.com/huaweicloud/terraform-provider-hcs) (v2.4.26, which targets
 HCS 8.3.1/8.5.x).
 
 ## Where this fits
@@ -138,7 +138,7 @@ the bind credentials into a `Secret` in the instance's namespace.
 ## Verification status & known limitations
 
 - Every Terraform module in this pak passes `tofu validate` against the real published
-  `huaweicloud/hcs` 2.4.28 provider schema, and the full broker behavior (catalog,
+  `huaweicloud/hcs` 2.4.26 provider schema, and the full broker behavior (catalog,
   provision variables, bind credentials, plan/property rules) is covered by 28
   integration tests that run against a mocked tofu.
 - **No live HCS acceptance testing has been performed yet** — the environment is
@@ -146,7 +146,7 @@ the bind credentials into a `Secret` in the instance's namespace.
   must be configured per site (see docs/configuration.md).
 - The HCS provider exports no private VIP attribute for ELB; the binding only carries
   the VIP when `ipv4_address` was set explicitly at provision time.
-- GaussDB has no per-account resource in provider v2.4.28, so its binding passes
+- GaussDB has no per-account resource in provider v2.4.26, so its binding passes
   through the instance administrator credentials.
 - RDS/GaussDB/DCS topology arguments (AZ, VPC, subnet, engine, volume type) are
   ForceNew in the provider and marked `prohibit_update` in the service definitions.

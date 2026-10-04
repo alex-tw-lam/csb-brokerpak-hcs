@@ -27,7 +27,7 @@ export HCS_INSECURE=true                          # for self-signed certificates
 ```
 
 `region`/`cloud` are passed as variables in the tfvars (not env) so the files are
-self-contained. `tofu init` downloads the pinned providers (huaweicloud/hcs 2.4.28,
+self-contained. `tofu init` downloads the pinned providers (huaweicloud/hcs 2.4.26,
 hashicorp/random 3.9.0) — run it on a connected machine, or mirror them for offline
 use.
 

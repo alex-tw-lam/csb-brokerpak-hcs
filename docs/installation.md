@@ -15,7 +15,7 @@ This guide covers building the brokerpak and getting it served by Cloud Service 
 
 ```bash
 # Stage release binaries into ./bin (the ONLY step that requires internet).
-# Downloads tofu 1.11.8, terraform-provider-hcs 2.4.28 and
+# Downloads tofu 1.11.3, terraform-provider-hcs 2.4.26 and
 # terraform-provider-random 3.9.0 for linux/amd64, verifies SHA256 checksums and
 # unpacks them into bin/<name>_<version>_<os>_<arch>/ directories.
 make fetch-binaries

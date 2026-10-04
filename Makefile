@@ -6,8 +6,8 @@ RUN_CSB ?= go run github.com/cloudfoundry/cloud-service-broker/v2
 
 PAK_BUILD_CACHE_PATH ?= $(shell pwd)/.pak-cache
 
-BIN_STAGED := bin/tofu_1.11.8_linux_amd64/tofu \
-	bin/terraform-provider-hcs_2.4.28_linux_amd64/terraform-provider-hcs_v2.4.28 \
+BIN_STAGED := bin/tofu_1.11.3_linux_amd64/tofu \
+	bin/terraform-provider-hcs_2.4.26_linux_amd64/terraform-provider-hcs_v2.4.26 \
 	bin/terraform-provider-random_3.9.0_linux_amd64/terraform-provider-random_v3.9.0
 
 TF_FILES := $(shell find terraform -name '*.tf' 2>/dev/null)
