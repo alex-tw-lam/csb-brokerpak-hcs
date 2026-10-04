@@ -13,11 +13,11 @@ accepts multiple `-var-file` flags — later files win — so the run command is
 tofu apply -var-file=../../examples/shared.tfvars -var-file=../../examples/<service>/<provision|bind>.tfvars
 ```
 
-The shared file and the provision tfvars are **generated** — edit
-`config/site-values.yaml` and run `make gen-config` (which also produces
-`hcs-broker.yaml`, so one set of site values serves both direct-tofu runs and the
-broker). The bind files are static: they hold per-binding choices and output
-placeholders.
+The shared file and the provision tfvars are **generated and gitignored** — edit
+`config/site-values.yaml` (materialized from `config/site-values.yaml.example`; your
+copy stays local) and run `make gen-config` (which also produces `hcs-broker.yaml`,
+so one set of site values serves both direct-tofu runs and the broker). The bind
+files are static tracked placeholders.
 
 ## Auth (every module, provider-native)
 

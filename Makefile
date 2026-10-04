@@ -37,8 +37,16 @@ fetch-binaries: ## Stage tofu and provider zips into ./bin (requires internet)
 manifest-reset: ## Replace local manifest.yml with the tracked example
 	cp manifest.yml.example manifest.yml
 
+config/site-values.yaml:
+	@cp config/site-values.yaml.example config/site-values.yaml
+	@echo "materialized config/site-values.yaml from the example (edit locally; it is gitignored)"
+
+.PHONY: site-values-reset
+site-values-reset: ## Replace local site-values.yaml with the tracked example
+	cp config/site-values.yaml.example config/site-values.yaml
+
 .PHONY: gen-config
-gen-config: ## Generate hcs-broker.yaml and example tfvars from config/site-values.yaml
+gen-config: config/site-values.yaml ## Generate hcs-broker.yaml and example tfvars
 	python3 scripts/gen-config.py
 
 

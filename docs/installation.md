@@ -40,22 +40,24 @@ copies local files verbatim, so the binaries must be **unpacked** — which is w
 PAK_OS=linux PAK_ARCH=arm64 scripts/fetch-binaries.sh
 ```
 
-## Local manifest changes
+## Local-only files (the example pattern)
 
-The tracked file is **`manifest.yml.example`**; the real `manifest.yml` is gitignored
-and yours to edit locally (tofu/provider versions, platform targets, `url_template`s)
-without ever being committed. `make build` and `make test` materialize it from the
-example automatically if it is missing:
+Any file meant to be locally modified is tracked as a `*.example` template; the real
+file is gitignored and materialized from the example on demand — local edits never
+get committed.
 
-```bash
-cp manifest.yml.example manifest.yml   # or just run make build
-$EDITOR manifest.yml                   # local changes stay local
-make manifest-reset                    # start over from the tracked example
-```
+| Tracked template | Local file (gitignored) | Materialized by | Reset with |
+|---|---|---|---|
+| `manifest.yml.example` | `manifest.yml` (version/platform/url_template experiments) | `make build` / `make test` | `make manifest-reset` |
+| `config/site-values.yaml.example` | `config/site-values.yaml` (your site values) | `make gen-config` | `make site-values-reset` |
 
-When the upstream example changes (e.g. a provider version bump), re-apply your local
-diffs onto a fresh copy: `diff manifest.yml manifest.yml.example`, then
-`make manifest-reset` and re-edit.
+The gen-config outputs are also local-only: `hcs-broker.yaml`,
+`examples/shared.tfvars` and `examples/<service>/provision.tfvars` are generated from
+your site values and gitignored (the bind tfvars are static placeholders and stay
+tracked).
+
+When an upstream example changes, re-apply your local diffs onto a fresh copy
+(`diff <local> <example>`), reset, and re-edit.
 
 ## Air-gapped workflow
 
