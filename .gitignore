@@ -26,3 +26,4 @@ brokerpak-user-docs.md
 coverage.out
 .pak-cache/
 .zcode/
+/manifest.yml

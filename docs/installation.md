@@ -42,21 +42,20 @@ PAK_OS=linux PAK_ARCH=arm64 scripts/fetch-binaries.sh
 
 ## Local manifest changes
 
-Local experiments often need temporary `manifest.yml` edits (tofu/provider versions,
-platform targets, `url_template`s) that should never be committed. The repo supports
-this with git's skip-worktree flag:
+The tracked file is **`manifest.yml.example`**; the real `manifest.yml` is gitignored
+and yours to edit locally (tofu/provider versions, platform targets, `url_template`s)
+without ever being committed. `make build` and `make test` materialize it from the
+example automatically if it is missing:
 
 ```bash
-make manifest-local-on      # hide local manifest.yml changes from git
-# ...edit manifest.yml freely; git status stays clean...
-make manifest-local-status  # check the current mode
-make manifest-local-off     # track normally again (needed to commit real changes)
+cp manifest.yml.example manifest.yml   # or just run make build
+$EDITOR manifest.yml                   # local changes stay local
+make manifest-reset                    # start over from the tracked example
 ```
 
-Caveats: while ON, a `git pull` that changes `manifest.yml` upstream will refuse to
-overwrite your local copy — run `make manifest-local-off`, reconcile (stash/merge),
-then `make manifest-local-on` again. To commit a genuine manifest change, switch OFF
-first.
+When the upstream example changes (e.g. a provider version bump), re-apply your local
+diffs onto a fresh copy: `diff manifest.yml manifest.yml.example`, then
+`make manifest-reset` and re-edit.
 
 ## Air-gapped workflow
 

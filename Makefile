@@ -33,23 +33,18 @@ help: ## Show this help
 fetch-binaries: ## Stage tofu and provider zips into ./bin (requires internet)
 	scripts/fetch-binaries.sh
 
+.PHONY: manifest-reset
+manifest-reset: ## Replace local manifest.yml with the tracked example
+	cp manifest.yml.example manifest.yml
+
 .PHONY: gen-config
 gen-config: ## Generate hcs-broker.yaml and example tfvars from config/site-values.yaml
 	python3 scripts/gen-config.py
 
-.PHONY: manifest-local-on
-manifest-local-on: ## Hide local manifest.yml changes from git (skip-worktree)
-	git update-index --skip-worktree manifest.yml
-	@echo "manifest.yml local changes are now local-only"
 
-.PHONY: manifest-local-off
-manifest-local-off: ## Track manifest.yml normally again (commit/pull normally)
-	git update-index --no-skip-worktree manifest.yml
-	@echo "manifest.yml is tracked normally again"
-
-.PHONY: manifest-local-status
-manifest-local-status: ## Show whether manifest.yml local changes are hidden
-	@git ls-files -v manifest.yml | grep -q '^S' && echo "manifest.yml: local changes hidden (skip-worktree ON)" || echo "manifest.yml: tracked normally (skip-worktree OFF)"
+manifest.yml:
+	@cp manifest.yml.example manifest.yml
+	@echo "materialized manifest.yml from manifest.yml.example (edit locally; it is gitignored)"
 
 $(PAK): manifest.yml $(wildcard hcs-*.yml) $(TF_FILES) $(BIN_STAGED)
 	$(BROKER_GO_OPTS) $(RUN_CSB) pak build
@@ -76,7 +71,7 @@ docs: build ## Generate brokerpak user docs
 test: lint run-integration-tests ## Run lint and integration tests
 
 .PHONY: run-integration-tests
-run-integration-tests: ## Run broker integration tests (mock Terraform, no HCS required)
+run-integration-tests: manifest.yml ## Run broker integration tests (mock Terraform, no HCS required)
 	cd integration-tests && go tool ginkgo -r .
 
 .PHONY: lint
