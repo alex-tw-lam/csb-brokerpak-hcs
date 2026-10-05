@@ -17,7 +17,10 @@ The shared file and the provision tfvars are **generated and gitignored** — ed
 `config/site-values.yaml` (materialized from `config/site-values.yaml.example`; your
 copy stays local) and run `make gen-config` (which also produces `hcs-broker.yaml`,
 so one set of site values serves both direct-tofu runs and the broker). The bind
-files are static tracked placeholders.
+files are **gitignored local copies** of the tracked `bind.tfvars.example` templates
+(`make gen-config` materializes them if missing, `make bind-tfvars-reset` restores
+them) — fill in the `OUTPUT-*` placeholders from the provision run's `tofu output`
+and your edits never reach git.
 
 ## Auth (every module, provider-native)
 

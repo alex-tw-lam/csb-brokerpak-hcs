@@ -45,9 +45,15 @@ config/site-values.yaml:
 site-values-reset: ## Replace local site-values.yaml with the tracked example
 	cp config/site-values.yaml.example config/site-values.yaml
 
+.PHONY: bind-tfvars-reset
+bind-tfvars-reset: ## Restore every examples/<svc>/bind.tfvars from its tracked template
+	@for f in examples/*/bind.tfvars.example; do cp "$$f" "$${f%.example}"; done
+	@echo "restored examples/*/bind.tfvars from tracked templates (they are gitignored)"
+
 .PHONY: gen-config
 gen-config: config/site-values.yaml ## Generate hcs-broker.yaml and example tfvars
 	python3 scripts/gen-config.py
+	@for f in examples/*/bind.tfvars.example; do dest="$${f%.example}"; [ -f "$$dest" ] || cp "$$f" "$$dest"; done
 
 
 manifest.yml:

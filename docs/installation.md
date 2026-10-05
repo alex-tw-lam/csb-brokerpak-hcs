@@ -50,11 +50,11 @@ get committed.
 |---|---|---|---|
 | `manifest.yml.example` | `manifest.yml` (version/platform/url_template experiments) | `make build` / `make test` | `make manifest-reset` |
 | `config/site-values.yaml.example` | `config/site-values.yaml` (your site values) | `make gen-config` | `make site-values-reset` |
+| `examples/<service>/bind.tfvars.example` | `examples/<service>/bind.tfvars` (`OUTPUT-*` filled from provision outputs) | `make gen-config` | `make bind-tfvars-reset` |
 
 The gen-config outputs are also local-only: `hcs-broker.yaml`,
 `examples/shared.tfvars` and `examples/<service>/provision.tfvars` are generated from
-your site values and gitignored (the bind tfvars are static placeholders and stay
-tracked).
+your site values and gitignored.
 
 When an upstream example changes, re-apply your local diffs onto a fresh copy
 (`diff <local> <example>`), reset, and re-edit.
