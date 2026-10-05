@@ -10,7 +10,7 @@ The layout is layered: **`examples/shared.tfvars`** carries the common values
 accepts multiple `-var-file` flags — later files win — so the run command is:
 
 ```bash
-tofu apply -var-file=../../examples/shared.tfvars -var-file=../../examples/<service>/<provision|bind>.tfvars
+tofu apply -var-file=../../../examples/shared.tfvars -var-file=../../../examples/<service>/<provision|bind>.tfvars
 ```
 
 The shared file and the provision tfvars are **generated and gitignored** — edit
@@ -58,8 +58,8 @@ Run pattern, identical for every row:
 ```bash
 cd terraform/<service>/<provision|bind>
 tofu init
-tofu plan  -var-file=../../examples/shared.tfvars -var-file=../../examples/<service>/<provision|bind>.tfvars
-tofu apply -var-file=../../examples/shared.tfvars -var-file=../../examples/<service>/<provision|bind>.tfvars
+tofu plan  -var-file=../../../examples/shared.tfvars -var-file=../../../examples/<service>/<provision|bind>.tfvars
+tofu apply -var-file=../../../examples/shared.tfvars -var-file=../../../examples/<service>/<provision|bind>.tfvars
 tofu output                                     # copy these into the bind tfvars
 ```
 
@@ -72,7 +72,7 @@ same one-line flip, restored afterwards:
 ```bash
 cd terraform/<service>/provision
 sed -i 's/prevent_destroy = true/prevent_destroy = false/' main.tf
-tofu destroy -var-file=../../examples/shared.tfvars -var-file=../../examples/<service>/provision.tfvars
+tofu destroy -var-file=../../../examples/shared.tfvars -var-file=../../../examples/<service>/provision.tfvars
 git restore main.tf        # put the guard back
 ```
 

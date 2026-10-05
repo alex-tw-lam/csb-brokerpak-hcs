@@ -69,8 +69,8 @@ HEADER = """# ------------------------------------------------------------------
 # file and run `make gen-config` instead of editing this one.
 # Run:  cd terraform/{svc}/{mod}
 #       tofu init
-#       tofu plan  -var-file=../../examples/shared.tfvars -var-file=../../examples/{svc}/{mod}.tfvars
-#       tofu apply -var-file=../../examples/shared.tfvars -var-file=../../examples/{svc}/{mod}.tfvars
+#       tofu plan  -var-file=../../../examples/shared.tfvars -var-file=../../../examples/{svc}/{mod}.tfvars
+#       tofu apply -var-file=../../../examples/shared.tfvars -var-file=../../../examples/{svc}/{mod}.tfvars
 # Auth: export HCS_ACCESS_KEY=... HCS_SECRET_KEY=...   (or IAM user/password)
 #       export HCS_INSECURE=true                        (self-signed certs)
 # -----------------------------------------------------------------------------

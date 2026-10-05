@@ -2,8 +2,8 @@
 # csb-hcs-dcs — bind (creates a DCS account)
 # Run:  cd terraform/dcs/bind
 #       tofu init
-#       tofu plan  -var-file=../../examples/shared.tfvars -var-file=../../examples/dcs/bind.tfvars
-#       tofu apply -var-file=../../examples/shared.tfvars -var-file=../../examples/dcs/bind.tfvars
+#       tofu plan  -var-file=../../../examples/shared.tfvars -var-file=../../../examples/dcs/bind.tfvars
+#       tofu apply -var-file=../../../examples/shared.tfvars -var-file=../../../examples/dcs/bind.tfvars
 # Auth: export HCS_ACCESS_KEY=... HCS_SECRET_KEY=...   (or IAM user/password)
 #       export HCS_INSECURE=true                        (self-signed certs)
 # Template: the working copy examples/dcs/bind.tfvars is gitignored (materialized

@@ -2,8 +2,8 @@
 # csb-hcs-rds-postgresql — bind (creates a DB account)
 # Run:  cd terraform/rds-postgresql/bind
 #       tofu init
-#       tofu plan  -var-file=../../examples/shared.tfvars -var-file=../../examples/rds-postgresql/bind.tfvars
-#       tofu apply -var-file=../../examples/shared.tfvars -var-file=../../examples/rds-postgresql/bind.tfvars
+#       tofu plan  -var-file=../../../examples/shared.tfvars -var-file=../../../examples/rds-postgresql/bind.tfvars
+#       tofu apply -var-file=../../../examples/shared.tfvars -var-file=../../../examples/rds-postgresql/bind.tfvars
 # Auth: export HCS_ACCESS_KEY=... HCS_SECRET_KEY=...   (or IAM user/password)
 #       export HCS_INSECURE=true                        (self-signed certs)
 # Template: the working copy examples/rds-postgresql/bind.tfvars is gitignored (materialized

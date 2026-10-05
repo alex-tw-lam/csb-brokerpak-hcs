@@ -2,8 +2,8 @@
 # csb-hcs-elb — bind (registers a backend member)
 # Run:  cd terraform/elb/bind
 #       tofu init
-#       tofu plan  -var-file=../../examples/shared.tfvars -var-file=../../examples/elb/bind.tfvars
-#       tofu apply -var-file=../../examples/shared.tfvars -var-file=../../examples/elb/bind.tfvars
+#       tofu plan  -var-file=../../../examples/shared.tfvars -var-file=../../../examples/elb/bind.tfvars
+#       tofu apply -var-file=../../../examples/shared.tfvars -var-file=../../../examples/elb/bind.tfvars
 # Auth: export HCS_ACCESS_KEY=... HCS_SECRET_KEY=...   (or IAM user/password)
 #       export HCS_INSECURE=true                        (self-signed certs)
 # Template: the working copy examples/elb/bind.tfvars is gitignored (materialized
