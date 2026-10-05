@@ -63,10 +63,21 @@ tofu apply -var-file=../../examples/shared.tfvars -var-file=../../examples/<serv
 tofu output                                     # copy these into the bind tfvars
 ```
 
-Destroy when done experimenting (`tofu destroy -var-file=...`); resources are
-protected by `prevent_destroy`, which tofu flips off only through an explicit
-`lifecycle` edit — for experiments set `force_destroy`-style options or remove the
-block temporarily.
+Destroying: bind workspaces destroy normally (`tofu destroy -var-file=...`). The
+provision resources are wrapped in `lifecycle { prevent_destroy = true }` (a guard
+against accidental replacement). Through the broker this is a no-op — CSB flips it
+off itself before deprovisioning — but raw tofu won't, so a direct destroy needs the
+same one-line flip, restored afterwards:
+
+```bash
+cd terraform/<service>/provision
+sed -i 's/prevent_destroy = true/prevent_destroy = false/' main.tf
+tofu destroy -var-file=../../examples/shared.tfvars -var-file=../../examples/<service>/provision.tfvars
+git restore main.tf        # put the guard back
+```
+
+Do **not** work around it with `tofu state rm` — that only makes tofu forget the
+resource; the real resource in HCS is left orphaned.
 
 ## Same values, three places
 
