@@ -28,6 +28,10 @@ brokerpak-user-docs.md
 *.sqlite*
 *.tfstate*
 
+# OpenTofu local artifacts (tofu init)
+.terraform/
+.terraform.lock.hcl
+
 # Go
 *.test
 coverage.out
