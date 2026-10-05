@@ -196,8 +196,9 @@ bind:
     type: string
     details: |
       Name of the DCS account created for this binding (hyphens are converted to
-      underscores). Only ha / cluster / proxy cluster instances support DCS
-      accounts; single-node instances reject bind with "does not support acl".
+      underscores). Only ha / cluster / proxy cluster instances on sites with the
+      DCS account feature enabled support accounts; single-node instances reject
+      bind with "does not support acl".
     default: csb-${str.truncate(16, request.binding_id)}
     constraints:
       minLength: 1
