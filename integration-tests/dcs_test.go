@@ -110,13 +110,64 @@ var _ = Describe("DCS", Label("dcs"), func() {
 		Expect(vars).To(
 			SatisfyAll(
 				HaveKeyWithValue("instance_id", "fake-dcs-id"),
+				HaveKeyWithValue("bind_mode", "account"),
 				HaveKeyWithValue("account_name", "appuser"),
 				HaveKeyWithValue("account_role", "write"),
+				HaveKeyWithValue("instance_password", "fake-redis-password"),
 				HaveKeyWithValue("domain_name", "fake-dcs-domain"),
 				HaveKeyWithValue("port", float64(6379)),
 				HaveKeyWithValue("region", fakeRegion),
 				HaveKeyWithValue("project_name", fakeProjectName),
 				HaveKeyWithValue("cloud", fakeCloud),
+			),
+		)
+	})
+
+	It("should bind in passthrough mode on sites without the acl feature flag", func() {
+		Expect(mockTerraform.SetTFState([]testframework.TFStateValue{
+			{Name: "instance_id", Type: "string", Value: "fake-dcs-id"},
+			{Name: "name", Type: "string", Value: "fake-dcs-name"},
+			{Name: "domain_name", Type: "string", Value: "fake-dcs-domain"},
+			{Name: "port", Type: "number", Value: float64(6379)},
+			{Name: "password", Type: "string", Value: "fake-redis-password"},
+			{Name: "region", Type: "string", Value: fakeRegion},
+			{Name: "project_name", Type: "string", Value: fakeProjectName},
+			{Name: "cloud", Type: "string", Value: fakeCloud},
+		})).To(Succeed())
+
+		instanceID, err := broker.Provision(dcsServiceName, "small", map[string]any{
+			"availability_zone": "az1",
+		})
+		Expect(err).NotTo(HaveOccurred())
+
+		Expect(mockTerraform.SetTFState([]testframework.TFStateValue{
+			{Name: "username", Type: "string", Value: "default"},
+			{Name: "password", Type: "string", Value: "fake-redis-password"},
+			{Name: "host", Type: "string", Value: "fake-dcs-domain"},
+			{Name: "port", Type: "number", Value: float64(6379)},
+			{Name: "uri", Type: "string", Value: "redis://default:fake-redis-password@fake-dcs-domain:6379/"},
+		})).To(Succeed())
+
+		creds, err := broker.Bind(dcsServiceName, "small", instanceID, map[string]any{
+			"bind_mode": "passthrough",
+		})
+		Expect(err).NotTo(HaveOccurred())
+		Expect(creds).To(
+			SatisfyAll(
+				HaveKeyWithValue("username", "default"),
+				HaveKeyWithValue("password", "fake-redis-password"),
+				HaveKeyWithValue("host", "fake-dcs-domain"),
+				HaveKeyWithValue("port", float64(6379)),
+				HaveKeyWithValue("uri", "redis://default:fake-redis-password@fake-dcs-domain:6379/"),
+			),
+		)
+
+		vars, err := lastTerraformInvocationVars(mockTerraform)
+		Expect(err).NotTo(HaveOccurred())
+		Expect(vars).To(
+			SatisfyAll(
+				HaveKeyWithValue("bind_mode", "passthrough"),
+				HaveKeyWithValue("instance_password", "fake-redis-password"),
 			),
 		)
 	})

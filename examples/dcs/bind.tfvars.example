@@ -10,9 +10,12 @@
 # by make gen-config, restored by make bind-tfvars-reset); edit the copy, never this file.
 # Fill OUTPUT-* placeholders from the provision run's `tofu output`.
 # -----------------------------------------------------------------------------
-# --- binding account ---
-# NOTE: DCS accounts need an ha/cluster/proxy instance; single-node instances
-# reject account creation with "tenant or instance does not support acl".
+# --- binding credential ---
+# bind_mode = "account" creates a per-binding DCS account (needs an ha/cluster/
+# proxy instance AND the site flag feature.dcs2.support.acl; without the flag
+# bind fails with DCS.4967 "The tenant does not support ACL"). "passthrough"
+# returns the instance password instead and works on any site.
+bind_mode    = "account"                         # account | passthrough
 account_name = "appuser"
 account_role = "write"                           # read | write
 

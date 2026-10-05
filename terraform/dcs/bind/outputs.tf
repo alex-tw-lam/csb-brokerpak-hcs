@@ -1,11 +1,11 @@
 output "username" {
-  description = "Username of the binding account."
-  value       = hcs_dcs_account.account.account_name
+  description = "Username of the binding credential (the DCS account, or \"default\" in passthrough mode)."
+  value       = local.username
 }
 
 output "password" {
-  description = "Randomly generated password of the binding account."
-  value       = random_password.password.result
+  description = "Password of the binding credential (randomly generated for the account, or the instance password in passthrough mode)."
+  value       = local.password
   sensitive   = true
 }
 

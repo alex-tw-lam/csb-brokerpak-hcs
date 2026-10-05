@@ -192,13 +192,24 @@ provision:
 bind:
   plan_inputs: []
   user_inputs:
+  - field_name: bind_mode
+    type: string
+    details: |
+      Credential strategy. "account" creates a per-binding DCS account (least
+      privilege; requires the site flag feature.dcs2.support.acl - without it
+      bind fails with DCS.4967 "The tenant does not support ACL"). "passthrough"
+      hands out the instance access password instead and works on any site.
+    default: account
+    enum:
+      account: per-binding DCS account
+      passthrough: instance password passthrough
   - field_name: account_name
     type: string
     details: |
       Name of the DCS account created for this binding (hyphens are converted to
-      underscores). Only ha / cluster / proxy cluster instances on sites with the
-      DCS account feature enabled support accounts; single-node instances reject
-      bind with "does not support acl".
+      underscores, account mode only). Requires an instance that supports ACL
+      accounts - master/standby, cluster or proxy cluster on Redis 6.0; single
+      node instances never do.
     default: csb-${str.truncate(16, request.binding_id)}
     constraints:
       minLength: 1
@@ -214,6 +225,10 @@ bind:
   computed_inputs:
   - name: instance_id
     default: ${instance.details["instance_id"]}
+    overwrite: true
+    type: string
+  - name: instance_password
+    default: ${instance.details["password"]}
     overwrite: true
     type: string
   - name: domain_name
