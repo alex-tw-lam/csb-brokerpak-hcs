@@ -55,7 +55,7 @@ provision:
     type: string
     details: DCS cache mode.
     enum:
-      single: single node
+      single: single node (no DCS accounts - bind unavailable)
       ha: master/standby
       cluster: cluster
       proxy: proxy cluster
@@ -196,7 +196,8 @@ bind:
     type: string
     details: |
       Name of the DCS account created for this binding (hyphens are converted to
-      underscores). Requires an instance whose engine version supports accounts.
+      underscores). Only ha / cluster / proxy cluster instances support DCS
+      accounts; single-node instances reject bind with "does not support acl".
     default: csb-${str.truncate(16, request.binding_id)}
     constraints:
       minLength: 1

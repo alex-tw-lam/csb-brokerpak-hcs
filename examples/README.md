@@ -43,7 +43,7 @@ use.
 | 3 | `terraform/rds-postgresql/provision` | `examples/rds-postgresql/provision.tfvars` | RDS PostgreSQL 12, single node |
 | 4 | `terraform/rds-postgresql/bind` | `examples/rds-postgresql/bind.tfvars` | per-binding DB account |
 | 5 | `terraform/dcs/provision` | `examples/dcs/provision.tfvars` | DCS Redis 5.0, single node 0.125GB |
-| 6 | `terraform/dcs/bind` | `examples/dcs/bind.tfvars` | per-binding DCS account |
+| 6 | `terraform/dcs/bind` | `examples/dcs/bind.tfvars` | per-binding DCS account (ha/cluster instances only — single-node has no ACL) |
 | 7 | `terraform/elb/provision` | `examples/elb/provision.tfvars` | TCP load balancer + listener + pool |
 | 8 | `terraform/elb/bind` | `examples/elb/bind.tfvars` | backend member + health monitor |
 | 9 | `terraform/gaussdb/provision` | `examples/gaussdb/provision.tfvars` | distributed GaussDB (hcs1 solution) |

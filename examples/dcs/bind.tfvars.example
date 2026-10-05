@@ -11,6 +11,8 @@
 # Fill OUTPUT-* placeholders from the provision run's `tofu output`.
 # -----------------------------------------------------------------------------
 # --- binding account ---
+# NOTE: DCS accounts need an ha/cluster/proxy instance; single-node instances
+# reject account creation with "tenant or instance does not support acl".
 account_name = "appuser"
 account_role = "write"                           # read | write
 
