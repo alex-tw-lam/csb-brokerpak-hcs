@@ -50,7 +50,7 @@ provision:
     details: DCS flavor spec code (site-specific). When a plan does not set a flavor, one is looked up automatically from `capacity`, `cache_mode` and `engine_version`.
   - field_name: capacity
     type: number
-    details: Cache capacity in GB (discrete values per cache mode; the matching DCS flavor is looked up automatically).
+    details: Cache capacity in GB (single/ha support 0.125-64; cluster starts at 4; the matching DCS flavor is looked up automatically).
   - field_name: cache_mode
     type: string
     details: DCS cache mode.
