@@ -97,7 +97,7 @@ one set of site values works everywhere:
 - Fill in your site values in the tfvars before the first run: `cloud`, `region`,
   image name, AZ names, disk type, flavor codes and the ELB flavor IDs.
 - Variables with sensible in-module behaviour (passwords, `flavor` on ECS/DCS,
-  `standby_availability_zone`, `backend_members`, `grant_principal`) are commented
-  out — uncomment to set them.
+  `standby_availability_zone`, `cpu_architecture` on DCS, `backend_members`,
+  `grant_principal`) are commented out — uncomment to set them.
 - `labels` is `{}` here; when the broker runs the module it also adds
   `namespace` / `instance_name` / `created_by` tags from the Service Catalog request.

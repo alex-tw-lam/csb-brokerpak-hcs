@@ -138,6 +138,7 @@ def gen_provision_tfvars(v, svc):
         ],
         "dcs": [
             '# standby_availability_zone = "az2"              # required for ha mode',
+            '# cpu_architecture = "x86_64"                   # x86_64 | aarch64; flavor lookup filter',
             '# password       = "..."                          # optional; random when omitted',
         ],
         "elb": [

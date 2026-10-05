@@ -13,10 +13,11 @@ data "hcs_networking_secgroups" "secgroup" {
 }
 
 data "hcs_dcs_flavors" "flavors" {
-  engine         = "Redis"
-  engine_version = var.engine_version
-  cache_mode     = var.cache_mode
-  capacity       = var.capacity
+  engine           = "Redis"
+  engine_version   = var.engine_version
+  cache_mode       = var.cache_mode
+  capacity         = var.capacity
+  cpu_architecture = var.cpu_architecture
 }
 
 locals {

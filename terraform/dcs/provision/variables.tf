@@ -38,6 +38,12 @@ variable "engine_version" {
   type        = string
 }
 
+variable "cpu_architecture" {
+  description = "CPU architecture filter for the flavor lookup (x86_64 or aarch64). Null accepts whatever the site offers."
+  type        = string
+  default     = null
+}
+
 variable "availability_zone" {
   description = "Primary availability zone."
   type        = string

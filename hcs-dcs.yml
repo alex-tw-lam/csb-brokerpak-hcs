@@ -87,6 +87,15 @@ provision:
     default: null
     details: Standby availability zone for "ha" cache mode. Ignored for single-node mode.
     prohibit_update: true
+  - field_name: cpu_architecture
+    type: string
+    nullable: true
+    default: null
+    details: CPU architecture filter for the flavor lookup (site-specific, "x86_64" or "aarch64"). When empty, whatever the site offers is used.
+    enum:
+      x86_64: x86_64
+      aarch64: aarch64 (Kunpeng)
+    prohibit_update: true
   - field_name: vpc_name
     type: string
     details: Name of an existing VPC for the network. Defaults to the site configuration (HCS_VPC_NAME); can be overridden per instance.

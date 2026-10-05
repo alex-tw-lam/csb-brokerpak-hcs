@@ -32,6 +32,7 @@ var _ = Describe("DCS", Label("dcs"), func() {
 				HaveKeyWithValue("engine_version", "5.0"),
 				HaveKeyWithValue("availability_zone", "az1"),
 				HaveKeyWithValue("standby_availability_zone", BeNil()),
+				HaveKeyWithValue("cpu_architecture", BeNil()),
 				HaveKeyWithValue("vpc_name", fakeVPCName),
 				HaveKeyWithValue("subnet_name", fakeDCSSubnetName),
 				HaveKeyWithValue("security_group_name", BeNil()),
@@ -51,6 +52,17 @@ var _ = Describe("DCS", Label("dcs"), func() {
 		})
 
 		Expect(err).To(MatchError(ContainSubstring("plan defined properties cannot be changed: capacity")))
+	})
+
+	It("should pass through a cpu architecture filter", func() {
+		_, err := broker.Provision(dcsServiceName, "small", map[string]any{
+			"availability_zone": "az1",
+			"cpu_architecture":  "aarch64",
+		})
+
+		Expect(err).NotTo(HaveOccurred())
+		Expect(mockTerraform.FirstTerraformInvocationVars()).
+			To(HaveKeyWithValue("cpu_architecture", "aarch64"))
 	})
 
 	It("should bind by creating a per-binding account with a random password", func() {
