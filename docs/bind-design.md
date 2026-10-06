@@ -1,5 +1,8 @@
 # Bind design patterns
 
+> For diagrams of the binding model and the five patterns, see
+> [bind-model.md](bind-model.md).
+
 Every OSB bind is its own Terraform workspace: computed inputs pull provision
 outputs out of `instance.details` via HIL (`${instance.details["..."]}`), and any
 resource created there lives exactly as long as the binding — unbind destroys the
