@@ -158,6 +158,7 @@ def gen_provision_tfvars(v, svc):
         "obs": [
             "# versioning    = false",
             '# encryption   = true                            # optional SSE-KMS',
+            '# enterprise_project_id = "05041f..."            # OBS lives in an enterprise project (resource space)',
         ],
     }
 

@@ -7,6 +7,8 @@ resource "hcs_obs_bucket" "bucket" {
   encryption = var.encryption
   kms_key_id = var.kms_key_id
 
+  enterprise_project_id = var.enterprise_project_id
+
   force_destroy = var.force_destroy
   region        = var.region
   tags          = local.tags

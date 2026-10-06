@@ -43,6 +43,12 @@ variable "kms_key_id" {
   default     = null
 }
 
+variable "enterprise_project_id" {
+  description = "Enterprise project (resource space) the bucket belongs to; the account default when null."
+  type        = string
+  default     = null
+}
+
 variable "force_destroy" {
   description = "Delete all objects when destroying the bucket."
   type        = bool

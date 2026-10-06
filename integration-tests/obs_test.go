@@ -30,6 +30,7 @@ var _ = Describe("OBS", Label("obs"), func() {
 				HaveKeyWithValue("versioning", false),
 				HaveKeyWithValue("encryption", false),
 				HaveKeyWithValue("kms_key_id", BeNil()),
+				HaveKeyWithValue("enterprise_project_id", BeNil()),
 				HaveKeyWithValue("force_destroy", false),
 				HaveKeyWithValue("region", fakeRegion),
 				HaveKeyWithValue("project_name", fakeProjectName),

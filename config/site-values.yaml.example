@@ -97,3 +97,5 @@ instances:
     acl: private
     storage_class: STANDARD
     force_destroy: true                      # convenient for trials
+    # enterprise_project_id: "05041f..."      # OBS buckets live in an enterprise project (resource space);
+                                              # omit to use the account default

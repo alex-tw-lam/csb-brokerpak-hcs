@@ -58,6 +58,15 @@ provision:
     nullable: true
     default: null
     details: KMS key ID for server-side encryption. When empty, the default master key is used.
+  - field_name: enterprise_project_id
+    type: string
+    nullable: true
+    default: null
+    details: |
+      Enterprise project (resource space) the bucket belongs to. OBS buckets live in
+      enterprise projects rather than IAM projects; when empty the account default
+      enterprise project is used. Changing it recreates the bucket.
+    prohibit_update: true
   - field_name: force_destroy
     type: boolean
     details: Delete all objects when destroying the bucket on deprovision. When false, deprovision fails if the bucket still contains objects.
