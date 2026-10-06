@@ -58,8 +58,12 @@ authorized on the resource. Unbind detaches the policy.
   `domain/<account-id>:user/<name>`; read or read-write.
 - **Caveat**: both bucket policies and bucket ACLs are singletons server-side, so
   at most one grant binding should be active per bucket — hence opt-in.
-- **Variant (unimplemented)**: cross-account grants via `hcs_obs_bucket_acl`
-  `account_permission { account_id, permission }`.
+- **Variant**: the provider's `hcs_obs_bucket_acl` only models owner, public,
+  log-delivery and cross-account (`account_permission`, "cannot be the bucket
+  owner") grantees. Same-account grants to users, groups or agencies therefore
+  stay on the policy side: `grant_principal` is passed verbatim as the policy
+  principal (`domain/<account-id>:user/<name>`, `...:group/<name>`, or
+  `...:agency/<name>`), so no separate ACL resource is needed.
 - GCP's bind is really patterns 2+3 fused (mint an SA, then grant it a role).
 
 ## 4. Backend registration (ELB)

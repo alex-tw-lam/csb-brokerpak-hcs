@@ -130,10 +130,14 @@ bind:
     nullable: true
     default: null
     details: |
-      Optional OBS principal (e.g. "domain/<account-id>:user/<user-name>") granted access to
-      the bucket. When set, the bind attaches a bucket policy for this principal; when empty
-      (default) the bind only passes through the bucket details. Note the bucket policy is a
-      singleton server-side, so only one grant binding should be active per bucket.
+      Optional OBS principal granted access to the bucket, passed verbatim into the
+      bucket policy. Accepted formats: "domain/<account-id>:user/<user-name>" for an
+      IAM/VDC user, "domain/<account-id>:group/<group-name>" for a user group (if the
+      site's OBS supports group principals), or "domain/<account-id>:agency/<name>" for
+      an agency. When set, the bind attaches a bucket policy for this principal; when
+      empty (default) the bind only passes through the bucket details. Note the bucket
+      policy is a singleton server-side, so only one grant binding should be active
+      per bucket.
   - field_name: grant_permission
     type: string
     details: Permission granted to `grant_principal`.
