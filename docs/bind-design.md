@@ -36,9 +36,14 @@ least privilege, one credential per binding.
   GCP Storage bind = `google_service_account` + `google_service_account_key` +
   `google_storage_bucket_iam_member`. Azure MSSQL bind = `csbsqlserver_binding`
   with a random username/password and `db_owner`.
-- **HCS gap**: the HCS provider ships no identity resources (no IAM user, no
-  access key, no STS data source), so OBS cannot mint credentials this way; this
-  is the pattern DCS uses via `hcs_dcs_account` and RDS via `hcs_rds_pg_account`.
+- **HCS**: identity lives in the VDC plane — `hcs_vdc_user` (with
+  `auth_type = MACHINE_USER` + `access_mode = programmatic` for app identities),
+  plus `hcs_vdc_user_group`, `hcs_vdc_role`, `hcs_vdc_group_role_assignment`,
+  `hcs_vdc_agency`, `hcs_vdc_project`, backed by HCS `rest/vdc/v3.x` APIs. A VDC
+  user can be minted, but the provider has no resource that issues an access key
+  (AK/SK) for one, so OBS-style signature credentials cannot be minted
+  end-to-end; DCS (`hcs_dcs_account`) and RDS (`hcs_rds_pg_account`) mint
+  service-native accounts instead.
 
 ## 3. Permission grant (OBS opt-in)
 
