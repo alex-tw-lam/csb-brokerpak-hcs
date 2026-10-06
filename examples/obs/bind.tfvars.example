@@ -13,5 +13,11 @@
 # --- values from the provision run's outputs ---
 bucket_name         = "OUTPUT-bucket_name"
 bucket_domain_name  = "OUTPUT-bucket_domain_name"
-grant_permission    = "read-write"
-# grant_principal   = "domain/<account-id>:user/<user>"   # set to attach a bucket policy
+
+# --- optional policy grant (attaches a bucket policy; the identity is NOT created here) ---
+# grant_principal is passed verbatim as the policy principal. Formats:
+#   domain/<account-id>:user/<user>       # an IAM/VDC user
+#   domain/<account-id>:group/<group>     # a user group (if the site's OBS supports it)
+#   domain/<account-id>:agency/<name>     # an agency
+grant_permission    = "read-write"        # read = list + get; read-write = + put + delete
+# grant_principal   = "domain/<account-id>:user/<user>"   # uncomment to grant
