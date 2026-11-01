@@ -16,29 +16,11 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 VALUES_FILE = ROOT / "config" / "site-values.yaml"
 BROKER_CONFIG = ROOT / "hcs-broker.yaml"
 
-SERVICES = ["ecs", "rds-postgresql", "elb", "gaussdb", "csms"]
+SERVICES = ["csms"]
 
 # Per-service convention values that rarely change per site; emitted into the
 # instance section so every required variable is covered.
 CONVENTION_DEFAULTS = {
-    "ecs": {"instance_name": "csb-test-ecs"},
-    "rds-postgresql": {
-        "instance_name": "csb-test-rds-pg",
-        "ha_replication_mode": "async",
-        "backup_start_time": "03:00-04:00",
-        "backup_keep_days": 7,
-    },
-    "elb": {"loadbalancer_name": "csb-test-elb"},
-    "gaussdb": {
-        "instance_name": "csb-test-gaussdb",
-        "ha_mode": "combined",
-        "ha_consistency": "eventual",
-        "ha_consistency_protocol": "quorum",
-        "sharding_num": 3,
-        "coordinator_num": 3,
-        "backup_start_time": "03:00-04:00",
-        "backup_keep_days": 7,
-    },
     "csms": {},
 }
 
@@ -74,95 +56,38 @@ HEADER = """# ------------------------------------------------------------------
 # -----------------------------------------------------------------------------
 """
 
+SIZING_KEYS = {
+    "csms": ["secret_name"],
+}
+
+OPTIONAL_NOTES = {
+    "csms": [
+        '# secret_text = "..."                            # optional; random when omitted',
+        '# kms_key_id  = "..."                            # optional; default KMS key when omitted',
+    ],
+}
+
 
 def gen_provision_tfvars(v, svc):
-    conn, net, inst = v["connection"], v["network"], v["instances"][svc]
+    inst = v["instances"][svc]
     lines = [HEADER.format(title=f"csb-hcs-{svc} — provision", svc=svc, mod="provision")]
 
-    if svc in net or svc.replace("-", "_") in net:
-        entry = net.get(svc) or net.get(svc.replace("-", "_"))
-        lines.append("# --- network (region/cloud/vpc_name come from examples/shared.tfvars) ---")
-        lines.append(kv("subnet_name", entry["subnet_name"]))
-        if "security_group_name" in entry:
-            lines.append(kv("security_group_name", entry["security_group_name"]))
+    lines.append("# --- secret ---")
+    for key in SIZING_KEYS[svc]:
+        lines.append(kv(key, inst[key]))
+    lines.append("")
+
+    sizing_keys = set(SIZING_KEYS[svc])
+    merged = {**CONVENTION_DEFAULTS[svc], **inst}
+    extra = {k: v2 for k, v2 in merged.items() if k not in sizing_keys}
+    if extra:
+        lines.append("# --- instance ---")
+        for key, value in extra.items():
+            lines.append(kv(key, value))
         lines.append("")
 
-    svc_blocks = {
-        "ecs": [
-            "# --- sizing ---",
-            ("flavor", "plan flavor; drop this line to auto-resolve from cores/memory"),
-        ],
-        "rds-postgresql": [
-            "# --- sizing ---",
-            ("flavor", "single node; use *.ha flavors with two AZs"),
-        ],
-        "elb": [
-            "# --- sizing (ELB flavor IDs are site-created; from your broker plan config) ---",
-            ("l4_flavor_id", None),
-            ("l7_flavor_id", None),
-        ],
-        "gaussdb": [
-            "# --- sizing ---",
-            ("flavor", None),
-            ("volume_type", None),
-            ("volume_size", None),
-        ],
-        "csms": [
-            "# --- secret ---",
-            ("secret_name", None),
-        ],
-    }
-
-    optional_notes = {
-        "ecs": [
-            '# admin_pass     = "..."                          # optional; random when omitted',
-        ],
-        "rds-postgresql": [
-            '# admin_password  = "..."                         # optional; random when omitted',
-            "# ha_replication_mode = \"async\"                  # used by .ha flavors only",
-        ],
-        "elb": [
-            '# ipv4_address    = "192.168.1.100"              # optional; set to know the private VIP',
-            "# backend_members = [                             # optional; or register backends on bind",
-            "#   { address = \"192.168.1.10\", port = 8080 },",
-            "# ]",
-        ],
-        "gaussdb": [
-            '# security_group_name   = "sg-gaussdb"           # optional; required for custom ports',
-            '# password              = "..."                  # optional; random when omitted',
-        ],
-        "csms": [
-            '# secret_text = "..."                            # optional; random when omitted',
-            '# kms_key_id  = "..."                            # optional; default KMS key when omitted',
-        ],
-    }
-
-    block = svc_blocks[svc]
-    lines.append(block[0])
-    for item in block[1:]:
-        key, comment = item
-        value = v["elb_plan"][key] if svc == "elb" else inst[key]
-        lines.append(kv(key, value, comment))
-    lines.append("")
-
-    lines.append("# --- instance ---")
-    sizing_keys = {k for b in block[1:] for k in [b[0]]}
-    merged = {**CONVENTION_DEFAULTS[svc], **inst}
-    for key, value in merged.items():
-        if key in sizing_keys:
-            continue
-        comment = {
-            "image_name": "site-specific IMS image name",
-            "system_disk_type": "site-specific disk type",
-            "availability_zones": "two entries for .ha flavors / must match the solution",
-            "solution": "AZ count depends on the solution",
-            "port": None,
-        }.get(key)
-        lines.append(kv(key, value, comment))
-    lines.append("")
-
-    lines.extend(optional_notes[svc])
-    if optional_notes[svc]:
+    lines.extend(OPTIONAL_NOTES[svc])
+    if OPTIONAL_NOTES[svc]:
         lines.append("")
 
     lines.append("# --- tags ---")
@@ -172,16 +97,7 @@ def gen_provision_tfvars(v, svc):
 
 
 def gen_broker_config(v):
-    conn, net, plan = v["connection"], v["network"], v["elb_plan"]
-
-    plans_json = json.dumps([{
-        "name": plan["name"],
-        "id": plan["id"],
-        "description": plan["description"],
-        "display_name": plan["name"],
-        "l4_flavor_id": plan["l4_flavor_id"],
-        "l7_flavor_id": plan["l7_flavor_id"],
-    }], separators=(",", ":"))
+    conn = v["connection"]
 
     lines = [
         "# GENERATED by scripts/gen-config.py from config/site-values.yaml — edit that",
@@ -200,21 +116,6 @@ def gen_broker_config(v):
     if conn.get("auth_url"):
         lines.append(f"  auth_url: {conn['auth_url']}")
     lines.append(f"  insecure: {str(conn.get('insecure', False)).lower()}")
-    lines.append("")
-    lines.append("  # Site network: one shared VPC, one subnet and security group per service — all by name.")
-    lines.append(f"  vpc_name: {net['vpc_name']}")
-    for svc in SERVICES:
-        entry = net.get(svc) or net.get(svc.replace("-", "_"))
-        if entry:
-            lines.append(f"  {svc.replace('-', '_')}:")
-            lines.append(f"    subnet_name: {entry['subnet_name']}")
-            if "security_group_name" in entry:
-                lines.append(f"    security_group_name: {entry['security_group_name']}")
-    lines.append("")
-    lines.append("# Plans for services whose sizing values are site-specific.")
-    lines.append("service:")
-    lines.append("  csb-hcs-elb:")
-    lines.append(f"    plans: '{plans_json}'")
     lines.append("")
     return "\n".join(lines)
 
@@ -253,9 +154,6 @@ def main():
         kv("region", v["connection"]["region"]),
         kv("cloud", v["connection"]["cloud"]),
         kv("project_name", v["connection"]["project_name"]),
-        "",
-        "# --- shared network ---",
-        kv("vpc_name", v["network"]["vpc_name"]),
         "",
     ]
     shared_path = ROOT / "examples" / "shared.tfvars"

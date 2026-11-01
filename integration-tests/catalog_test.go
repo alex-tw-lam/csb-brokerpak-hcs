@@ -8,85 +8,14 @@ import (
 )
 
 var _ = Describe("Catalog", Label("catalog"), func() {
-	It("should publish all five HCS services in the catalog", func() {
+	It("should publish the CSMS service in the catalog", func() {
 		catalog, err := broker.Catalog()
 		Expect(err).NotTo(HaveOccurred())
 
-		services := map[string]string{
-			"csb-hcs-ecs":            ecsServiceID,
-			"csb-hcs-rds-postgresql": rdsPostgresServiceID,
-			"csb-hcs-elb":            elbServiceID,
-			"csb-hcs-gaussdb":        gaussdbServiceID,
-			"csb-hcs-csms":           csmsServiceID,
-		}
-
-		for name, id := range services {
-			service := testframework.FindService(catalog, name)
-			Expect(service.ID).To(Equal(id), "unexpected id for %s", name)
-			Expect(service.Tags).To(ContainElement("hcs"), "expected hcs tag for %s", name)
-			Expect(service.Metadata.DisplayName).NotTo(BeEmpty(), "expected display name for %s", name)
-		}
-	})
-
-	It("should publish inline plans for the ECS service", func() {
-		catalog, err := broker.Catalog()
-		Expect(err).NotTo(HaveOccurred())
-
-		service := testframework.FindService(catalog, "csb-hcs-ecs")
-		Expect(service.Plans).To(ConsistOf(
-			MatchFields(IgnoreExtras, Fields{
-				Name: Equal("small"),
-				ID:   Equal(ecsSmallPlanID),
-			}),
-			MatchFields(IgnoreExtras, Fields{
-				Name: Equal("medium"),
-				ID:   Equal(ecsMediumPlanID),
-			}),
-			MatchFields(IgnoreExtras, Fields{
-				Name: Equal("large"),
-				ID:   Equal(ecsLargePlanID),
-			}),
-		))
-	})
-
-	It("should publish environment injected plans for the ELB service", func() {
-		catalog, err := broker.Catalog()
-		Expect(err).NotTo(HaveOccurred())
-
-		Expect(testframework.FindService(catalog, "csb-hcs-rds-postgresql").Plans).To(ConsistOf(
-			MatchFields(IgnoreExtras, Fields{
-				Name: Equal("small"),
-				ID:   Equal(rdsPostgresSmallPlanID),
-			}),
-			MatchFields(IgnoreExtras, Fields{
-				Name: Equal("medium"),
-				ID:   Equal(rdsPostgresMediumPlanID),
-			}),
-			MatchFields(IgnoreExtras, Fields{
-				Name: Equal("large"),
-				ID:   Equal(rdsPostgresLargePlanID),
-			}),
-		))
-		Expect(testframework.FindService(catalog, "csb-hcs-elb").Plans).To(ConsistOf(
-			MatchFields(IgnoreExtras, Fields{
-				Name: Equal("default"),
-				ID:   Equal(elbCustomPlanID),
-			}),
-		))
-		Expect(testframework.FindService(catalog, "csb-hcs-gaussdb").Plans).To(ConsistOf(
-			MatchFields(IgnoreExtras, Fields{
-				Name: Equal("small"),
-				ID:   Equal(gaussdbSmallPlanID),
-			}),
-			MatchFields(IgnoreExtras, Fields{
-				Name: Equal("medium"),
-				ID:   Equal(gaussdbMediumPlanID),
-			}),
-			MatchFields(IgnoreExtras, Fields{
-				Name: Equal("large"),
-				ID:   Equal(gaussdbLargePlanID),
-			}),
-		))
+		service := testframework.FindService(catalog, "csb-hcs-csms")
+		Expect(service.ID).To(Equal(csmsServiceID))
+		Expect(service.Tags).To(ContainElement("hcs"))
+		Expect(service.Metadata.DisplayName).NotTo(BeEmpty())
 	})
 
 	It("should publish the default plan for the CSMS service", func() {

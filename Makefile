@@ -12,11 +12,6 @@ BIN_STAGED := bin/tofu_1.11.3_linux_amd64/tofu \
 
 TF_FILES := $(shell find terraform -name '*.tf' 2>/dev/null)
 
-# Sample plans for services whose sizing values are site-specific.
-# csb-hcs-rds-postgresql and csb-hcs-gaussdb ship inline plans (see their ymls) that this
-# environment variable can override; only csb-hcs-elb requires plans via environment.
-export GSB_SERVICE_CSB_HCS_ELB_PLANS ?= [{"name":"default","id":"1d1c9366-6f51-4f51-8eb0-6a1a29f36c1e","description":"Default ELB plan","display_name":"default","l4_flavor_id":"CHANGE_ME","l7_flavor_id":"CHANGE_ME"}]
-
 BROKER_GO_OPTS := \
 	DB_TYPE=sqlite3 DB_PATH=/tmp/csb-hcs.db \
 	SECURITY_USER_NAME=user SECURITY_USER_PASSWORD=pass \

@@ -94,14 +94,14 @@ flowchart LR
 
 ```mermaid
 flowchart TD
-    Q1{"service has its own<br/>account subsystem?"} -->|yes| M["② mint<br/>(RDS-PG)"]
+    Q1{"service has its own<br/>account subsystem?"} -->|yes| M["② mint<br/>(design reference)"]
     Q1 -->|no| Q2{"resource can authorize an<br/>existing cloud identity?"}
-    Q2 -->|yes| G["③ grant<br/>(no current service)"]
+    Q2 -->|yes| G["③ grant<br/>(design reference)"]
     Q2 -->|no| Q3{"resource is a traffic<br/>entry point?"}
-    Q3 -->|yes| RG["④ register<br/>(ELB)"]
+    Q3 -->|yes| RG["④ register<br/>(design reference)"]
     Q3 -->|no| Q4{"the resource itself<br/>is a secret?"}
     Q4 -->|yes| RB["⑤ read-back<br/>(CSMS)"]
-    Q4 -->|no| PT["① passthrough<br/>(ECS)"]
+    Q4 -->|no| PT["① passthrough<br/>(design reference)"]
 ```
 
 Site feature flags can force a fallback (a site-level switch may disable

@@ -13,7 +13,7 @@ consumers?**
 The five patterns used across this brokerpak, with the rationale and how the
 official AWS/Azure/GCP brokerpaks solve the same problem:
 
-## 1. Passthrough (ECS)
+## 1. Passthrough (design reference; no current service uses it)
 
 No resources. The bind echoes the connection details (addresses, domain names,
 ports) from provision outputs; the app authenticates with credentials it already
@@ -26,7 +26,7 @@ owns.
   `azure-redis` and `azure-mongodb` binds are `noop.tf` templates with no outputs
   at all; consumers are expected to use the provision outputs / console.
 
-## 2. Credential minting (RDS PostgreSQL)
+## 2. Credential minting (design reference; no current service uses it)
 
 Bind creates a fresh identity *inside the service's own account subsystem* plus a
 random secret, and returns them. Unbind deletes the account — instant revocation,
@@ -45,7 +45,7 @@ least privilege, one credential per binding.
   `hcs_vdc_agency`, `hcs_vdc_project`, backed by HCS `rest/vdc/v3.x` APIs. A VDC
   user can be minted, but the provider has no resource that issues an access key
   (AK/SK) for one, so storage-style signature credentials cannot be minted
-  end-to-end; RDS (`hcs_rds_pg_account`) mints a service-native account instead.
+  end-to-end (this pak previously shipped an RDS service using `hcs_rds_pg_account`).
 
 ## 3. Permission grant (design reference; no current service uses it)
 
@@ -68,7 +68,7 @@ authorized on the resource. Unbind detaches the policy.
   `...:agency/<name>`), so no separate ACL resource is needed.
 - GCP's bind is really patterns 2+3 fused (mint an SA, then grant it a role).
 
-## 4. Backend registration (ELB)
+## 4. Backend registration (design reference; no current service uses it)
 
 The provisioned resource is a traffic entry point; the consumer is a backend.
 Bind registers the consumer's address in the resource's pool (+ health monitor);

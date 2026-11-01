@@ -69,10 +69,6 @@ When an upstream example changes, re-apply your local diffs onto a fresh copy
 5. At runtime CSB extracts tofu and the providers from the pak and runs
    `tofu init -plugin-dir=...`; the HCS API is the only outbound connection.
 
-Note: the broker refuses to start until the plan environment variables for
-`csb-hcs-mysql`, `csb-hcs-elb` and `csb-hcs-gaussdb` are set (see
-configuration.md) — their flavor codes are site-specific by design.
-
 ## Running CSB with the brokerpak
 
 CSB discovers brokerpaks via `GSB_BROKERPAK_BUILTIN_PATH` (a directory containing

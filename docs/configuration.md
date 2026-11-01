@@ -6,17 +6,15 @@ that one file, then `make gen-config` generates both artifacts:
 ```bash
 make gen-config
 # -> hcs-broker.yaml                      (csb serve --config hcs-broker.yaml)
-# -> examples/<service>/provision.tfvars  (direct OpenTofu runs, see examples/README.md)
+# -> examples/csms/provision.tfvars       (direct OpenTofu runs, see examples/README.md)
 csb serve --config hcs-broker.yaml
 ```
 
-It carries everything static: the HCS connection settings (`hcs.cloud`, `hcs.region`,
-…), the site network tree (`hcs.vpc_name` and the per-service
-`subnet_name`/`security_group_name` keys) and the ELB plan definitions
-(`service.csb-hcs-elb.plans`, JSON as a string). Only credentials are expected in the
-environment. Keys listed in the manifest's `env_config_mapping` can still be set via
-`HCS_*` environment variables — those override the file — which is handy for tests and
-one-off runs.
+It carries everything static: the HCS connection settings (`hcs.cloud`,
+`hcs.region`, `hcs.project_name`, …) and the per-instance inputs for direct
+OpenTofu runs. Only credentials are expected in the environment. Keys listed in
+the manifest's `env_config_mapping` can still be set via `HCS_*` environment
+variables — those override the file — which is handy for tests and one-off runs.
 
 ## Broker API & storage (CSB core)
 
@@ -65,82 +63,26 @@ Credentials are passed as environment variables and are read natively by
 | `HCS_AUTH_URL` | `https://iam-apigateway-proxy.hcs.example.com/v3` | Overrides the derived Keystone v3 endpoint |
 | `HCS_INSECURE` | `true` | Skip TLS verification (typical for HCS self-signed certs) |
 
-### Site network defaults
-
-One shared VPC plus a dedicated subnet and security group per service — **all by
-name**, configured once in the config file (`hcs:` tree). Names are resolved to IDs at
-provision time (`hcs_vpcs` for the VPC, `hcs_vpc_subnets` per subnet,
-`hcs_networking_secgroups` per security group), so no UUIDs ever appear in the
-configuration.
-
-| Config key | Env override | Used by |
-|---|---|---|
-| `hcs.vpc_name` | `HCS_VPC_NAME` | ecs, rds-postgresql, elb, gaussdb (shared VPC) |
-| `hcs.ecs.subnet_name` | `HCS_ECS_SUBNET_NAME` | ecs |
-| `hcs.ecs.security_group_name` | `HCS_ECS_SECURITY_GROUP_NAME` | ecs |
-| `hcs.rds_postgresql.subnet_name` | `HCS_RDS_POSTGRESQL_SUBNET_NAME` | rds-postgresql |
-| `hcs.rds_postgresql.security_group_name` | `HCS_RDS_POSTGRESQL_SECURITY_GROUP_NAME` | rds-postgresql |
-| `hcs.elb.subnet_name` | `HCS_ELB_SUBNET_NAME` | elb |
-| `hcs.gaussdb.subnet_name` | `HCS_GAUSSDB_SUBNET_NAME` | gaussdb |
-
-The optional security group input on `csb-hcs-gaussdb` (custom port only)
-remains a per-instance parameter (also by name).
-
 If your site's service endpoint hostnames do not follow the
 `<service>.<region>.<cloud>` convention, set the provider `endpoints` map — this
 currently requires extending `provider.tf` in the service modules.
 
 ## Plans
 
-`csb-hcs-ecs`, `csb-hcs-rds-postgresql` and `csb-hcs-gaussdb` ship with
-inline plans in their service definitions, so the broker starts with a usable catalog
-out of the box. `csb-hcs-elb` alone requires operator-defined plans because ELB flavor
-IDs are site-specific — the broker refuses to start until its variable is set:
+`csb-hcs-csms` ships with its inline `default` plan in the service definition, so
+the broker starts with a usable catalog out of the box. It can be replaced per site
+via the plans environment variable (JSON array; plan `properties` keys must be
+declared in the service's `plan_inputs`):
 
 ```bash
-export GSB_SERVICE_CSB_HCS_ELB_PLANS='[{"name":"default","id":"<uuid>","description":"default ELB","display_name":"default","l4_flavor_id":"<site-flavor-id>","l7_flavor_id":"<site-flavor-id>"}]'
+export GSB_SERVICE_CSB_HCS_CSMS_PLANS='[{"name":"default","id":"<uuid>","description":"default secret plan","display_name":"default"}]'
 ```
 
-The inline plans can be replaced per site via the same environment variables (JSON
-array; plan `properties` keys must be declared in that service's `plan_inputs`):
-
-```bash
-export GSB_SERVICE_CSB_HCS_RDS_POSTGRESQL_PLANS='[{"name":"small","id":"<uuid>","description":"single node","display_name":"small","flavor":"rds.pg.n1.large.2"}]'
-export GSB_SERVICE_CSB_HCS_GAUSSDB_PLANS='[{"name":"small","id":"<uuid>","description":"centralized HA","display_name":"small","flavor":"gaussdb.opengauss.ee.m6.2xlarge.x868.ha"}]'
-```
-
-Notes:
-
-- Plans are flavor-based wherever a meaningful default exists: `csb-hcs-ecs` uses
-  `s6.*` spec codes, `csb-hcs-rds-postgresql` uses `rds.pg.*`, `csb-hcs-gaussdb` uses
-  `gaussdb.opengauss.ee.*`.
-- `csb-hcs-elb` is the exception: ELB flavors are created per site (see
-  `hcs_elb_flavor`), so its plans must be defined via the environment variable above.
-- The shipped flavor codes come from the provider documentation examples; verify them
-  against your site's flavor catalog and override where needed.
-- HA RDS flavors carry an `.ha` suffix and require **two** entries in
-  `availability_zones`; single-node flavors need one AZ.
-- GaussDB `flavor`/`solution` determine how many availability zones must be provided
-  (`hcs1..hcs7` are the HCS-specific combined solutions).
 - Plan properties cannot be overridden by user parameters at provision time.
-- The Makefile exports a sample ELB plan (replace the `CHANGE_ME` flavor IDs before
-  real use); the `.envrc` file documents the same for local development.
-
-## Site-specific user inputs
-
-| Input | Service | Notes |
-|---|---|---|
-| `image_name` | ecs | Exact IMS image name, resolved via `hcs_ims_images` |
-| `system_disk_type` | ecs | e.g. `business_type_01` — HCS disk type catalog differs per site |
-| `eip_iptype` | ecs, elb | e.g. `5_bgp`/`5_sbgp` or site network name |
-| `availability_zone`/`availability_zones` | all | Site AZ naming (e.g. `az1.dc1`) — per-instance input |
-| `vpc_name` + `subnet_name` | ecs, rds-postgresql, elb, gaussdb | Defaulted per service from the site network configuration above |
-| `security_group_name` | rds-postgresql (defaulted), ecs (defaulted), gaussdb (optional, per-instance) | Existing security groups |
 
 ## Tagging
 
-Every service that supports tags (all except `csb-hcs-gaussdb`, whose provider resource
-has no tags argument) applies these tags to the provisioned resource:
+The CSMS secret carries these tags:
 
 | Tag | Source |
 |---|---|
@@ -157,32 +99,12 @@ provisioning without Service Catalog (e.g. plain curl) still works. Note HCS tag
 value constraints apply — usernames containing unusual characters are passed through
 verbatim and may be rejected by the API on strict sites.
 
-## Service-specific behavior
+## Service behavior
 
-- **ECS**: `flavor_id` may be set explicitly; otherwise the flavor is auto-resolved
-  from the plan's `cores`/`memory_gb` via `hcs_ecs_compute_flavors` in the target AZ.
-- **RDS for PostgreSQL (`csb-hcs-rds-postgresql`) bind**: creates a dedicated `hcs_rds_pg_account` per binding with a
-  random password; `user_name` defaults to `csb-<binding id>` and hyphens are
-  converted to underscores to satisfy PostgreSQL account naming (the name must not
-  start with "pg" or a digit). The connection URI targets the default `postgres`
-  database.
-- **ELB (TCP-based)**: the listener protocol defaults to TCP. Binding registers a
-  backend member (`address` + `port`, optional `weight`) in the pool with an optional
-  health check (TCP probe, or HTTP for HTTP/HTTPS listeners); unbinding removes the
-  member. Set `ipv4_address` explicitly at provision time if you need the private VIP in
-  the binding (provider limitation); backend `subnet_id` uses the neutron subnet id
-  resolved from `subnet_name`.
-- **ECS bind**: exposes the instance addresses plus the administrator password
-  (generated at provision when not provided; username is image-dependent, typically
-  root on Linux).
-- **GaussDB bind**: passes through the instance administrator credentials (no
-  per-account resource in provider v2.4.26). Endpoint lists are passed through
-  instance details as comma-joined strings and re-split in the bind module.
-- **CSMS bind**: reads the latest secret version via `hcs_csms_secret_version`.
-- Password inputs left empty on any service are generated by `random_password` with
-  HCS-compatible special characters and returned via the binding credentials.
-- Bind credentials are randomly generated wherever the provider supports per-binding
-  identities: `csb-hcs-rds-postgresql` (DB account).
-  `csb-hcs-gaussdb` bindings pass through the instance administrator password (the
-  provider has no per-account resource); `csb-hcs-ecs`/`csb-hcs-elb`
-  bindings carry no credentials.
+- **Provision**: creates an `hcs_csms_secret`. `secret_name` defaults to
+  `csb-<instance id>`; `secret_text` is generated by `random_password` (HCS-compatible
+  special characters) when left empty; an optional `kms_key_id` selects the encryption
+  key (the CSMS default key when empty).
+- **Bind**: reads the latest secret version back via `hcs_csms_secret_version` and
+  returns `name` / `value` / `version`.
+- **Update**: changing `secret_text` creates a new secret version.

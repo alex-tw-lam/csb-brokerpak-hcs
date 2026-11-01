@@ -43,21 +43,16 @@ HCS 8.3.1/8.5.x).
 
 | Service | Name | Plans | Bind credentials |
 |---|---|---|---|
-| ECS compute instance | `csb-hcs-ecs` | inline: small/medium/large (`s6.*` flavor codes; cores/memory fallback) | instance addresses + admin password |
-| RDS for PostgreSQL | `csb-hcs-rds-postgresql` | inline: small (single node), medium/large (primary/standby) | per-binding DB account (`username`/`password`/`hostname`/`port`/`uri`/`jdbcUrl`) |
-| Elastic Load Balance (TCP) | `csb-hcs-elb` | operator-configured (ELB flavor IDs are site-specific) | registers the bound backend in the pool (+health check); VIP/EIP + listener |
-| GaussDB (openGauss) | `csb-hcs-gaussdb` | inline: small (centralized HA), medium/large (distributed) | administrator credentials + endpoints |
 | CSMS secret | `csb-hcs-csms` | inline: `default` | secret name/value/version |
 
-Only `csb-hcs-elb` needs operator-defined plans via environment variables (its flavor
-IDs are site-specific); see [docs/configuration.md](docs/configuration.md) for the full
-configuration reference, including how to override the inline plans per site.
+The pak ships with the CSMS service; see [docs/configuration.md](docs/configuration.md)
+for the configuration reference.
 
 ## Repository layout
 
 ```
 manifest.yml                  # brokerpak manifest: tofu + provider binaries, env mapping
-hcs-*.yml                     # one service definition per service
+hcs-csms.yml                  # the CSMS service definition
 terraform/<svc>/{provision,bind}/*.tf
 integration-tests/            # brokerpaktestframework suite (mocked tofu, runs offline)
 scripts/fetch-binaries.sh     # the only step that needs internet: stages ./bin zips
@@ -135,19 +130,13 @@ the bind credentials into a `Secret` in the instance's namespace.
 
 ## Verification status & known limitations
 
-- Every Terraform module in this pak passes `tofu validate` against the real published
-  `huaweicloud/hcs` 2.4.26 provider schema, and the full broker behavior (catalog,
-  provision variables, bind credentials, plan/property rules) is covered by 28
-  integration tests that run against a mocked tofu.
-- **No live HCS acceptance testing has been performed yet** — the environment is
-  air-gapped. Flavor codes, image names, disk types and AZ names are site-specific and
-  must be configured per site (see docs/configuration.md).
-- The HCS provider exports no private VIP attribute for ELB; the binding only carries
-  the VIP when `ipv4_address` was set explicitly at provision time.
-- GaussDB has no per-account resource in provider v2.4.26, so its binding passes
-  through the instance administrator credentials.
-- RDS/GaussDB topology arguments (AZ, VPC, subnet, engine, volume type) are
-  ForceNew in the provider and marked `prohibit_update` in the service definitions.
+- The Terraform modules pass `tofu validate` against the real published
+  `huaweicloud/hcs` 2.4.26 provider schema, and the broker behavior (catalog,
+  provision variables, bind credentials) is covered by integration tests that run
+  against a mocked tofu.
+- The CSMS service has been exercised end to end (provision, bind, destroy) on a real
+  HCS 8.5.1 site with direct OpenTofu runs; the broker flow itself uses the same
+  modules.
 
 ## License
 
