@@ -13,7 +13,7 @@ consumers?**
 The five patterns used across this brokerpak, with the rationale and how the
 official AWS/Azure/GCP brokerpaks solve the same problem:
 
-## 1. Passthrough (ECS, OBS default)
+## 1. Passthrough (ECS)
 
 No resources. The bind echoes the connection details (addresses, domain names,
 ports) from provision outputs; the app authenticates with credentials it already
@@ -26,7 +26,7 @@ owns.
   `azure-redis` and `azure-mongodb` binds are `noop.tf` templates with no outputs
   at all; consumers are expected to use the provision outputs / console.
 
-## 2. Credential minting (RDS PostgreSQL, DCS account mode)
+## 2. Credential minting (RDS PostgreSQL)
 
 Bind creates a fresh identity *inside the service's own account subsystem* plus a
 random secret, and returns them. Unbind deletes the account — instant revocation,
@@ -44,11 +44,10 @@ least privilege, one credential per binding.
   plus `hcs_vdc_user_group`, `hcs_vdc_role`, `hcs_vdc_group_role_assignment`,
   `hcs_vdc_agency`, `hcs_vdc_project`, backed by HCS `rest/vdc/v3.x` APIs. A VDC
   user can be minted, but the provider has no resource that issues an access key
-  (AK/SK) for one, so OBS-style signature credentials cannot be minted
-  end-to-end; DCS (`hcs_dcs_account`) and RDS (`hcs_rds_pg_account`) mint
-  service-native accounts instead.
+  (AK/SK) for one, so storage-style signature credentials cannot be minted
+  end-to-end; RDS (`hcs_rds_pg_account`) mints a service-native account instead.
 
-## 3. Permission grant (OBS opt-in)
+## 3. Permission grant (design reference; no current service uses it)
 
 Bind attaches a policy/ACL to the resource naming an *existing* principal. No new
 credential exists; the consumer keeps using its own identity, which has just been
@@ -101,5 +100,5 @@ Ask, in order:
 4. Is the resource itself the secret → **read back** (pattern 5).
 5. Otherwise → **passthrough** (pattern 1).
 
-Site feature flags can gate pattern 2 (e.g. DCS accounts need
-`feature.dcs2.support.acl`; bind_mode falls back to passthrough).
+Site feature flags can gate pattern 2 (a site-level switch may disable
+account creation; bind_mode falls back to passthrough).

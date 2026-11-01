@@ -28,8 +28,6 @@ network:
   rds_postgresql:
     subnet_name: subnet-rds-pg
     security_group_name: sg-rds-pg
-  dcs:
-    subnet_name: subnet-dcs
   elb:
     subnet_name: subnet-elb
   gaussdb:
@@ -66,13 +64,6 @@ instances:
     availability_zones: [az1]
     port: 5432
 
-  dcs:
-    capacity: 0.125
-    cache_mode: single
-    engine_version: "5.0"
-    availability_zone: az1
-    port: 6379
-
   elb:
     listener_protocol: TCP
     listener_port: 80
@@ -92,10 +83,3 @@ instances:
   csms:
     secret_name: csb-test-secret
 
-  obs:
-    bucket_name: csb-test-bucket-CHANGE_ME   # globally unique, DNS-compatible
-    acl: private
-    storage_class: STANDARD
-    force_destroy: true                      # convenient for trials
-    # enterprise_project_id: "05041f..."      # OBS buckets live in an enterprise project (resource space);
-                                              # omit to use the account default

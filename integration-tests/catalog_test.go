@@ -8,18 +8,16 @@ import (
 )
 
 var _ = Describe("Catalog", Label("catalog"), func() {
-	It("should publish all seven HCS services in the catalog", func() {
+	It("should publish all five HCS services in the catalog", func() {
 		catalog, err := broker.Catalog()
 		Expect(err).NotTo(HaveOccurred())
 
 		services := map[string]string{
 			"csb-hcs-ecs":            ecsServiceID,
 			"csb-hcs-rds-postgresql": rdsPostgresServiceID,
-			"csb-hcs-dcs":            dcsServiceID,
 			"csb-hcs-elb":            elbServiceID,
 			"csb-hcs-gaussdb":        gaussdbServiceID,
 			"csb-hcs-csms":           csmsServiceID,
-			"csb-hcs-obs":            obsServiceID,
 		}
 
 		for name, id := range services {
@@ -47,44 +45,6 @@ var _ = Describe("Catalog", Label("catalog"), func() {
 			MatchFields(IgnoreExtras, Fields{
 				Name: Equal("large"),
 				ID:   Equal(ecsLargePlanID),
-			}),
-		))
-	})
-
-	It("should publish the HA plan for the DCS service", func() {
-		catalog, err := broker.Catalog()
-		Expect(err).NotTo(HaveOccurred())
-
-		service := testframework.FindService(catalog, "csb-hcs-dcs")
-		Expect(service.Plans).To(ContainElement(
-			MatchFields(IgnoreExtras, Fields{
-				Name: Equal("ha-large"),
-				ID:   Equal(dcsHAPlanID),
-			}),
-		))
-	})
-
-	It("should publish inline plans for the DCS service", func() {
-		catalog, err := broker.Catalog()
-		Expect(err).NotTo(HaveOccurred())
-
-		service := testframework.FindService(catalog, "csb-hcs-dcs")
-		Expect(service.Plans).To(ConsistOf(
-			MatchFields(IgnoreExtras, Fields{
-				Name: Equal("small"),
-				ID:   Equal(dcsSmallPlanID),
-			}),
-			MatchFields(IgnoreExtras, Fields{
-				Name: Equal("medium"),
-				ID:   Equal(dcsMediumPlanID),
-			}),
-			MatchFields(IgnoreExtras, Fields{
-				Name: Equal("large"),
-				ID:   Equal(dcsLargePlanID),
-			}),
-			MatchFields(IgnoreExtras, Fields{
-				Name: Equal("ha-large"),
-				ID:   Equal(dcsHAPlanID),
 			}),
 		))
 	})

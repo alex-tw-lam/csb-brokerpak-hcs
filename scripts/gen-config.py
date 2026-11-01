@@ -16,7 +16,7 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 VALUES_FILE = ROOT / "config" / "site-values.yaml"
 BROKER_CONFIG = ROOT / "hcs-broker.yaml"
 
-SERVICES = ["ecs", "rds-postgresql", "dcs", "elb", "gaussdb", "csms", "obs"]
+SERVICES = ["ecs", "rds-postgresql", "elb", "gaussdb", "csms"]
 
 # Per-service convention values that rarely change per site; emitted into the
 # instance section so every required variable is covered.
@@ -28,7 +28,6 @@ CONVENTION_DEFAULTS = {
         "backup_start_time": "03:00-04:00",
         "backup_keep_days": 7,
     },
-    "dcs": {"instance_name": "csb-test-dcs"},
     "elb": {"loadbalancer_name": "csb-test-elb"},
     "gaussdb": {
         "instance_name": "csb-test-gaussdb",
@@ -41,7 +40,6 @@ CONVENTION_DEFAULTS = {
         "backup_keep_days": 7,
     },
     "csms": {},
-    "obs": {"versioning": False},
 }
 
 
@@ -98,12 +96,6 @@ def gen_provision_tfvars(v, svc):
             "# --- sizing ---",
             ("flavor", "single node; use *.ha flavors with two AZs"),
         ],
-        "dcs": [
-            "# --- sizing ---",
-            ("capacity", None),
-            ("cache_mode", "single | ha | cluster | proxy"),
-            ("engine_version", None),
-        ],
         "elb": [
             "# --- sizing (ELB flavor IDs are site-created; from your broker plan config) ---",
             ("l4_flavor_id", None),
@@ -119,13 +111,6 @@ def gen_provision_tfvars(v, svc):
             "# --- secret ---",
             ("secret_name", None),
         ],
-        "obs": [
-            "# --- bucket ---",
-            ("bucket_name", "globally unique in OBS, DNS-compatible"),
-            ("acl", None),
-            ("storage_class", None),
-            ("force_destroy", "convenient for trials; false in production"),
-        ],
     }
 
     optional_notes = {
@@ -135,11 +120,6 @@ def gen_provision_tfvars(v, svc):
         "rds-postgresql": [
             '# admin_password  = "..."                         # optional; random when omitted',
             "# ha_replication_mode = \"async\"                  # used by .ha flavors only",
-        ],
-        "dcs": [
-            '# standby_availability_zone = "az2"              # required for ha mode',
-            '# cpu_architecture = "x86_64"                   # x86_64 | aarch64; flavor lookup filter',
-            '# password       = "..."                          # optional; random when omitted',
         ],
         "elb": [
             '# ipv4_address    = "192.168.1.100"              # optional; set to know the private VIP',
@@ -154,11 +134,6 @@ def gen_provision_tfvars(v, svc):
         "csms": [
             '# secret_text = "..."                            # optional; random when omitted',
             '# kms_key_id  = "..."                            # optional; default KMS key when omitted',
-        ],
-        "obs": [
-            "# versioning    = false",
-            '# encryption   = true                            # optional SSE-KMS',
-            '# enterprise_project_id = "05041f..."            # OBS lives in an enterprise project (resource space)',
         ],
     }
 

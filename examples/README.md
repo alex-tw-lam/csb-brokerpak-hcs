@@ -42,16 +42,12 @@ use.
 | 2 | `terraform/ecs/bind` | `examples/ecs/bind.tfvars` | passthrough (addresses + admin password) |
 | 3 | `terraform/rds-postgresql/provision` | `examples/rds-postgresql/provision.tfvars` | RDS PostgreSQL 12, single node |
 | 4 | `terraform/rds-postgresql/bind` | `examples/rds-postgresql/bind.tfvars` | per-binding DB account |
-| 5 | `terraform/dcs/provision` | `examples/dcs/provision.tfvars` | DCS Redis 5.0, single node 0.125GB |
-| 6 | `terraform/dcs/bind` | `examples/dcs/bind.tfvars` | per-binding DCS account, or `bind_mode = "passthrough"` (instance password) on sites without `feature.dcs2.support.acl` |
-| 7 | `terraform/elb/provision` | `examples/elb/provision.tfvars` | TCP load balancer + listener + pool |
-| 8 | `terraform/elb/bind` | `examples/elb/bind.tfvars` | backend member + health monitor |
-| 9 | `terraform/gaussdb/provision` | `examples/gaussdb/provision.tfvars` | distributed GaussDB (hcs1 solution) |
-| 10 | `terraform/gaussdb/bind` | `examples/gaussdb/bind.tfvars` | admin passthrough |
-| 11 | `terraform/csms/provision` | `examples/csms/provision.tfvars` | CSMS secret (random value) |
-| 12 | `terraform/csms/bind` | `examples/csms/bind.tfvars` | reads back the latest secret version |
-| 13 | `terraform/obs/provision` | `examples/obs/provision.tfvars` | OBS bucket |
-| 14 | `terraform/obs/bind` | `examples/obs/bind.tfvars` | passthrough (optional policy grant) |
+| 5 | `terraform/elb/provision` | `examples/elb/provision.tfvars` | TCP load balancer + listener + pool |
+| 6 | `terraform/elb/bind` | `examples/elb/bind.tfvars` | backend member + health monitor |
+| 7 | `terraform/gaussdb/provision` | `examples/gaussdb/provision.tfvars` | distributed GaussDB (hcs1 solution) |
+| 8 | `terraform/gaussdb/bind` | `examples/gaussdb/bind.tfvars` | admin passthrough |
+| 9 | `terraform/csms/provision` | `examples/csms/provision.tfvars` | CSMS secret (random value) |
+| 10 | `terraform/csms/bind` | `examples/csms/bind.tfvars` | reads back the latest secret version |
 
 Run pattern, identical for every row:
 
@@ -96,8 +92,7 @@ one set of site values works everywhere:
 
 - Fill in your site values in the tfvars before the first run: `cloud`, `region`,
   image name, AZ names, disk type, flavor codes and the ELB flavor IDs.
-- Variables with sensible in-module behaviour (passwords, `flavor` on ECS/DCS,
-  `standby_availability_zone`, `cpu_architecture` on DCS, `backend_members`,
-  `grant_principal`) are commented out — uncomment to set them.
+- Variables with sensible in-module behaviour (passwords, `flavor` on ECS,
+  `backend_members`) are commented out — uncomment to set them.
 - `labels` is `{}` here; when the broker runs the module it also adds
   `namespace` / `instance_name` / `created_by` tags from the Service Catalog request.

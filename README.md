@@ -45,11 +45,9 @@ HCS 8.3.1/8.5.x).
 |---|---|---|---|
 | ECS compute instance | `csb-hcs-ecs` | inline: small/medium/large (`s6.*` flavor codes; cores/memory fallback) | instance addresses + admin password |
 | RDS for PostgreSQL | `csb-hcs-rds-postgresql` | inline: small (single node), medium/large (primary/standby) | per-binding DB account (`username`/`password`/`hostname`/`port`/`uri`/`jdbcUrl`) |
-| DCS (Redis engine) | `csb-hcs-dcs` | inline: small/medium/large single-node + ha-large (flavor-based) | per-binding DCS account: `username`/`password`/`host`/`port`/`uri` |
 | Elastic Load Balance (TCP) | `csb-hcs-elb` | operator-configured (ELB flavor IDs are site-specific) | registers the bound backend in the pool (+health check); VIP/EIP + listener |
 | GaussDB (openGauss) | `csb-hcs-gaussdb` | inline: small (centralized HA), medium/large (distributed) | administrator credentials + endpoints |
 | CSMS secret | `csb-hcs-csms` | inline: `default` | secret name/value/version |
-| OBS bucket | `csb-hcs-obs` | inline: `default` | bucket name/domain/region (+opt-in policy grant) |
 
 Only `csb-hcs-elb` needs operator-defined plans via environment variables (its flavor
 IDs are site-specific); see [docs/configuration.md](docs/configuration.md) for the full
@@ -148,7 +146,7 @@ the bind credentials into a `Secret` in the instance's namespace.
   the VIP when `ipv4_address` was set explicitly at provision time.
 - GaussDB has no per-account resource in provider v2.4.26, so its binding passes
   through the instance administrator credentials.
-- RDS/GaussDB/DCS topology arguments (AZ, VPC, subnet, engine, volume type) are
+- RDS/GaussDB topology arguments (AZ, VPC, subnet, engine, volume type) are
   ForceNew in the provider and marked `prohibit_update` in the service definitions.
 
 ## License

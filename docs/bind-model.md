@@ -40,7 +40,7 @@ addresses.
 ```mermaid
 flowchart LR
     B["bind workspace<br/>(no resources)"] -->|echo| O["outputs:<br/>bucket, domain, port"]
-    A["app"] -->|"connects with its OWN AK/SK"| R[("OBS bucket")]
+    A["app"] -->|"connects with its OWN AK/SK"| R[("cloud resource")]
 ```
 
 ### ② Credential minting — create an identity inside the service
@@ -50,8 +50,8 @@ subsystem. Unbind deletes it — instant revocation.
 
 ```mermaid
 flowchart LR
-    B["bind workspace"] -->|creates| C["account + random password<br/>(hcs_rds_pg_account / hcs_dcs_account)"]
-    A["app"] -->|"minted username/password"| R[("RDS / DCS instance")]
+    B["bind workspace"] -->|creates| C["account + random password<br/>(hcs_rds_pg_account)"]
+    A["app"] -->|"minted username/password"| R[("RDS instance")]
 ```
 
 ### ③ Permission grant — authorize an existing identity
@@ -62,7 +62,7 @@ credential is created; unbind detaches the policy.
 ```mermaid
 flowchart LR
     B["bind workspace"] -->|attaches| P["bucket policy<br/>Principal: domain/…:user/… | group/… | agency/…"]
-    A["app with existing identity"] -->|"own AK/SK, now authorized"| R[("OBS bucket")]
+    A["app with existing identity"] -->|"own AK/SK, now authorized"| R[("cloud resource")]
 ```
 
 ### ④ Backend registration — attach the consumer to an entry point
@@ -94,15 +94,15 @@ flowchart LR
 
 ```mermaid
 flowchart TD
-    Q1{"service has its own<br/>account subsystem?"} -->|yes| M["② mint<br/>(RDS-PG, DCS account mode)"]
+    Q1{"service has its own<br/>account subsystem?"} -->|yes| M["② mint<br/>(RDS-PG)"]
     Q1 -->|no| Q2{"resource can authorize an<br/>existing cloud identity?"}
-    Q2 -->|yes| G["③ grant<br/>(OBS)"]
+    Q2 -->|yes| G["③ grant<br/>(no current service)"]
     Q2 -->|no| Q3{"resource is a traffic<br/>entry point?"}
     Q3 -->|yes| RG["④ register<br/>(ELB)"]
     Q3 -->|no| Q4{"the resource itself<br/>is a secret?"}
     Q4 -->|yes| RB["⑤ read-back<br/>(CSMS)"]
-    Q4 -->|no| PT["① passthrough<br/>(ECS, OBS default, DCS passthrough mode)"]
+    Q4 -->|no| PT["① passthrough<br/>(ECS)"]
 ```
 
-Site feature flags can force a fallback (e.g. DCS accounts need
-`feature.dcs2.support.acl`; without it bind_mode falls back to passthrough).
+Site feature flags can force a fallback (a site-level switch may disable
+account creation; bind_mode falls back to passthrough).

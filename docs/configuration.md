@@ -75,17 +75,16 @@ configuration.
 
 | Config key | Env override | Used by |
 |---|---|---|
-| `hcs.vpc_name` | `HCS_VPC_NAME` | ecs, rds-postgresql, dcs, elb, gaussdb (shared VPC) |
+| `hcs.vpc_name` | `HCS_VPC_NAME` | ecs, rds-postgresql, elb, gaussdb (shared VPC) |
 | `hcs.ecs.subnet_name` | `HCS_ECS_SUBNET_NAME` | ecs |
 | `hcs.ecs.security_group_name` | `HCS_ECS_SECURITY_GROUP_NAME` | ecs |
 | `hcs.rds_postgresql.subnet_name` | `HCS_RDS_POSTGRESQL_SUBNET_NAME` | rds-postgresql |
 | `hcs.rds_postgresql.security_group_name` | `HCS_RDS_POSTGRESQL_SECURITY_GROUP_NAME` | rds-postgresql |
-| `hcs.dcs.subnet_name` | `HCS_DCS_SUBNET_NAME` | dcs |
 | `hcs.elb.subnet_name` | `HCS_ELB_SUBNET_NAME` | elb |
 | `hcs.gaussdb.subnet_name` | `HCS_GAUSSDB_SUBNET_NAME` | gaussdb |
 
-The optional security group inputs on `csb-hcs-dcs` (Redis 3.0 only) and
-`csb-hcs-gaussdb` (custom port only) remain per-instance parameters (also by name).
+The optional security group input on `csb-hcs-gaussdb` (custom port only)
+remains a per-instance parameter (also by name).
 
 If your site's service endpoint hostnames do not follow the
 `<service>.<region>.<cloud>` convention, set the provider `endpoints` map — this
@@ -93,7 +92,7 @@ currently requires extending `provider.tf` in the service modules.
 
 ## Plans
 
-`csb-hcs-ecs`, `csb-hcs-rds-postgresql`, `csb-hcs-dcs`, `csb-hcs-gaussdb` and `csb-hcs-obs` ship with
+`csb-hcs-ecs`, `csb-hcs-rds-postgresql` and `csb-hcs-gaussdb` ship with
 inline plans in their service definitions, so the broker starts with a usable catalog
 out of the box. `csb-hcs-elb` alone requires operator-defined plans because ELB flavor
 IDs are site-specific — the broker refuses to start until its variable is set:
@@ -108,17 +107,13 @@ array; plan `properties` keys must be declared in that service's `plan_inputs`):
 ```bash
 export GSB_SERVICE_CSB_HCS_RDS_POSTGRESQL_PLANS='[{"name":"small","id":"<uuid>","description":"single node","display_name":"small","flavor":"rds.pg.n1.large.2"}]'
 export GSB_SERVICE_CSB_HCS_GAUSSDB_PLANS='[{"name":"small","id":"<uuid>","description":"centralized HA","display_name":"small","flavor":"gaussdb.opengauss.ee.m6.2xlarge.x868.ha"}]'
-export GSB_SERVICE_CSB_HCS_DCS_PLANS='[{"name":"medium","id":"<uuid>","description":"single node 1GB","display_name":"medium","capacity":1,"cache_mode":"single","engine_version":"5.0"}]'
 ```
 
 Notes:
 
 - Plans are flavor-based wherever a meaningful default exists: `csb-hcs-ecs` uses
   `s6.*` spec codes, `csb-hcs-rds-postgresql` uses `rds.pg.*`, `csb-hcs-gaussdb` uses
-  `gaussdb.opengauss.ee.*`, and `csb-hcs-dcs` exposes an optional `flavor` plan
-  property (when a plan leaves it empty, the flavor is auto-resolved from capacity,
-  cache mode and engine version; `ha-large` ships the documented
-  `redis.ha.xu1.large.r2.4` code).
+  `gaussdb.opengauss.ee.*`.
 - `csb-hcs-elb` is the exception: ELB flavors are created per site (see
   `hcs_elb_flavor`), so its plans must be defined via the environment variable above.
 - The shipped flavor codes come from the provider documentation examples; verify them
@@ -139,8 +134,8 @@ Notes:
 | `system_disk_type` | ecs | e.g. `business_type_01` — HCS disk type catalog differs per site |
 | `eip_iptype` | ecs, elb | e.g. `5_bgp`/`5_sbgp` or site network name |
 | `availability_zone`/`availability_zones` | all | Site AZ naming (e.g. `az1.dc1`) — per-instance input |
-| `vpc_name` + `subnet_name` | ecs, rds-postgresql, dcs, elb, gaussdb | Defaulted per service from the site network configuration above |
-| `security_group_name` | rds-postgresql (defaulted), ecs (defaulted), dcs/gaussdb (optional, per-instance) | Existing security groups |
+| `vpc_name` + `subnet_name` | ecs, rds-postgresql, elb, gaussdb | Defaulted per service from the site network configuration above |
+| `security_group_name` | rds-postgresql (defaulted), ecs (defaulted), gaussdb (optional, per-instance) | Existing security groups |
 
 ## Tagging
 
@@ -171,11 +166,6 @@ verbatim and may be rejected by the API on strict sites.
   converted to underscores to satisfy PostgreSQL account naming (the name must not
   start with "pg" or a digit). The connection URI targets the default `postgres`
   database.
-- **DCS (`csb-hcs-dcs`) — Redis engine**: connection uses `domain_name` (the provider exports no IP attribute);
-  the flavor comes from the plan when set, otherwise it is auto-resolved from
-  `capacity`/`cache_mode`/`engine_version` via `hcs_dcs_flavors`. Bindings create a
-  per-binding `hcs_dcs_account` with a random password (requires an engine version
-  supporting accounts, Redis 4.0+).
 - **ELB (TCP-based)**: the listener protocol defaults to TCP. Binding registers a
   backend member (`address` + `port`, optional `weight`) in the pool with an optional
   health check (TCP probe, or HTTP for HTTP/HTTPS listeners); unbinding removes the
@@ -192,7 +182,7 @@ verbatim and may be rejected by the API on strict sites.
 - Password inputs left empty on any service are generated by `random_password` with
   HCS-compatible special characters and returned via the binding credentials.
 - Bind credentials are randomly generated wherever the provider supports per-binding
-  identities: `csb-hcs-rds-postgresql` (DB account) and `csb-hcs-dcs` (DCS account).
+  identities: `csb-hcs-rds-postgresql` (DB account).
   `csb-hcs-gaussdb` bindings pass through the instance administrator password (the
-  provider has no per-account resource); `csb-hcs-ecs`/`csb-hcs-elb`/`csb-hcs-obs`
+  provider has no per-account resource); `csb-hcs-ecs`/`csb-hcs-elb`
   bindings carry no credentials.
